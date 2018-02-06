@@ -9,7 +9,7 @@ const config = nconf
   .env('__')
   .defaults({
     caspar: {
-      config: '../casparcg.config'
+      // config: '../casparcg.config'
     },
     paths: {
       template: '../template',
