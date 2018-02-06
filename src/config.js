@@ -12,14 +12,14 @@ const config = nconf
       // config: '../casparcg.config'
     },
     paths: {
-      template: '../template',
-      media: '../media',
-      font: '../font',
+      template: './template',
+      media: './media',
+      font: './font',
       ffmpeg: process.platform === 'win32'
-        ? path.join(process.cwd(), './bin/win32/ffmpeg.exe')
+        ? path.join(process.cwd(), './ffmpeg.exe')
         : 'ffmpeg',
       ffprobe: process.platform === 'win32'
-        ? path.join(process.cwd(), './bin/win32/ffprobe.exe')
+        ? path.join(process.cwd(), './ffprobe.exe')
         : 'ffprobe'
     },
     scanner: {
