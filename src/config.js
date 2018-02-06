@@ -1,46 +1,50 @@
-const nconf = require('nconf')
+// const nconf = require('nconf')
 const pkg = require('../package.json')
 const fs = require('fs')
 const xml2js = require('xml2js')
 const path = require('path')
 
-const config = nconf
-  .argv()
-  .env('__')
-  .defaults({
-    caspar: {
-      // config: '../casparcg.config'
-    },
-    paths: {
-      template: './template',
-      media: './media',
-      font: './font',
-      ffmpeg: process.platform === 'win32'
-        ? path.join(process.cwd(), './ffmpeg.exe')
-        : 'ffmpeg',
-      ffprobe: process.platform === 'win32'
-        ? path.join(process.cwd(), './ffprobe.exe')
-        : 'ffprobe'
-    },
-    scanner: {
-      paths: null
-      // Note: See https://www.npmjs.com/package/chokidar#api.
-    },
-    thumbnails: {
-      width: 256,
-      height: -1
-    },
-    isProduction: process.env.NODE_ENV === 'production',
-    logger: {
-      level: process.env.NODE_ENV === 'production' ? 'info' : 'trace',
-      name: pkg.name,
-      prettyPrint: process.env.NODE_ENV !== 'production'
-    },
-    http: {
-      port: 8000
-    }
-  })
-  .get()
+const defaults = {
+  caspar: {
+    config: './casparcg.config'
+  },
+  paths: {
+    template: './template',
+    media: './media',
+    font: './font',
+    ffmpeg: process.platform === 'win32'
+      ? path.join(process.cwd(), './ffmpeg.exe')
+      : 'ffmpeg',
+    ffprobe: process.platform === 'win32'
+      ? path.join(process.cwd(), './ffprobe.exe')
+      : 'ffprobe'
+  },
+  scanner: {
+    paths: null
+    // Note: See https://www.npmjs.com/package/chokidar#api.
+  },
+  thumbnails: {
+    width: 256,
+    height: -1
+  },
+  isProduction: process.env.NODE_ENV === 'production',
+  logger: {
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'trace',
+    name: pkg.name,
+    prettyPrint: process.env.NODE_ENV !== 'production'
+  },
+  http: {
+    port: 8000
+  }
+}
+
+const config = defaults
+  // TODO: Doesn't work with nexe
+  // nconf
+  // .argv()
+  // .env('__')
+  // .defaults()
+  // .get()
 
 if (config.caspar && config.caspar.config) {
   const parser = new xml2js.Parser()

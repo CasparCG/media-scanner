@@ -18,14 +18,13 @@ module.exports = function ({ config, db, logger }) {
   Observable
     .create(o => {
       const watcher = chokidar
-        .watch(config.scanner.paths, {
+        .watch(config.scanner.paths, Object.assign({
           alwaysStat: true,
           awaitWriteFinish: {
             stabilityThreshold: 2000,
             pollInterval: 100
           },
-          ...config.scanner
-        })
+        }, config.scanner))
         .on('error', err => logger.error({ err }))
         .on('add', (path, stat) => o.next([ path, stat ]))
         .on('change', (path, stat) => o.next([ path, stat ]))

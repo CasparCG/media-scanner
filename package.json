@@ -1,11 +1,12 @@
 {
-  "name": "casparcg",
+  "name": "scanner",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon ./src",
-    "lint": "standard"
+    "lint": "standard",
+    "build-win32": "nexe src/index.js -o scanner.exe"
   },
   "author": "",
   "dependencies": {
@@ -23,6 +24,7 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
+    "nexe": "^2.0.0-rc.24",
     "nodemon": "^1.14.12",
     "standard": "^10.0.3"
   }
