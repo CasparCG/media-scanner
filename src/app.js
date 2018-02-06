@@ -30,7 +30,9 @@ module.exports = function ({ db, config, logger }) {
     try {
       let str = '200 TLS OK\r\n'
       for (const templatePath of await recursiveReadDirAsync(config.paths.template)) {
-        str += `${getId(config.paths.template, templatePath)}\r\n`
+        if (/\.(ft|wt|ct|html)$/.test(templatePath)) {
+          str += `${getId(config.paths.template, templatePath)}\r\n`
+        }
       }
       str += '\r\n'
       res.send(str)
