@@ -1,4 +1,4 @@
-// const nconf = require('nconf')
+const nconf = require('nconf')
 const pkg = require('../package.json')
 const fs = require('fs')
 const xml2js = require('xml2js')
@@ -38,13 +38,11 @@ const defaults = {
   }
 }
 
-const config = defaults
-  // TODO: Doesn't work with nexe
-  // nconf
-  // .argv()
-  // .env('__')
-  // .defaults()
-  // .get()
+const config = nconf
+  .argv()
+  .env('__')
+  .defaults(defaults)
+  .get()
 
 if (config.caspar && config.caspar.config) {
   const parser = new xml2js.Parser()
