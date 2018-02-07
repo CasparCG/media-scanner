@@ -146,6 +146,8 @@ module.exports = function ({ config, db, logger }) {
           return reject(new Error('not media'))
         }
 
+        // TODO (fix) Analyze all streams. Not just first one.
+
         const timeBase = json.streams[0].time_base || '1/25'
         const duration = json.streams[0].duration_ts || 1
 
