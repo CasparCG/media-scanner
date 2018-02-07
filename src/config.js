@@ -9,9 +9,9 @@ const defaults = {
     // config: './casparcg.config'
   },
   paths: {
-    template: 'M:/template',
-    media: 'M:/media',
-    font: 'M:/font',
+    template: './template',
+    media: './media',
+    font: './font',
     ffmpeg: process.platform === 'win32'
       ? path.join(process.cwd(), './ffmpeg.exe')
       : 'ffmpeg',
