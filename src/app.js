@@ -29,6 +29,7 @@ module.exports = function ({ db, config, logger }) {
   app.get('/tls', async (req, res, next) => {
     try {
       let str = '200 TLS OK\r\n'
+      // TODO (perf) Use scanner?
       for (const templatePath of await recursiveReadDirAsync(config.paths.template)) {
         if (/\.(ft|wt|ct|html)$/.test(templatePath)) {
           str += `${getId(config.paths.template, templatePath)}\r\n`
@@ -44,6 +45,7 @@ module.exports = function ({ db, config, logger }) {
   app.get('/fls', async (req, res, next) => {
     try {
       let str = '200 FLS OK\r\n'
+      // TODO (perf) Use scanner?
       for (const fontPath of await recursiveReadDirAsync(config.paths.fonts)) {
         str += `${getId(config.paths.fonts, fontPath)}\r\n`
       }
@@ -67,7 +69,7 @@ module.exports = function ({ db, config, logger }) {
 
   app.get('/thumbnail/generate', async (req, res, next) => {
     try {
-      // TODO Force generate?
+      // TODO (fix) Force scanner to scan and wait?
       res.send('202 THUMBNAIL GENERATE_ALL OK\r\n')
     } catch (err) {
       next(err)
@@ -76,7 +78,7 @@ module.exports = function ({ db, config, logger }) {
 
   app.get('/thumbnail/generate/:id', async (req, res, next) => {
     try {
-      // TODO Wait for scanner?
+      // TODO (fix) Wait for scanner?
       res.send('202 THUMBNAIL GENERATE OK\r\n')
     } catch (err) {
       next(err)
