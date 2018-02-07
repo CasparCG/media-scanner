@@ -6,8 +6,11 @@ FROM node:8.9.4 as PACKAGE
 FROM node:8.9.4
   WORKDIR /usr/src/app
   ENV NODE_ENV production
+  ENV PATHS__FFMPEG avconv
+  ENV PATHS__FFPROBE avprobe
 
-	COPY --from=casparcg/ffmpeg:3.4.1 /opt/ffmpeg /usr/bin/ffmpeg
+  RUN apt-get update
+  RUN apt-get install libav-tools -y
 
   COPY --from=PACKAGE /usr/src/app ./
   COPY yarn.lock ./
