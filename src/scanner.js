@@ -134,6 +134,7 @@ module.exports = function ({ config, db, logger }) {
         '-hide_banner',
         '-i', `"${doc.mediaPath}"`,
         '-show_streams',
+        '-show_format',
         '-print_format', 'json'
       ]
       cp.exec(args.join(' '), (err, stdout, stderr) => {
@@ -146,12 +147,17 @@ module.exports = function ({ config, db, logger }) {
           return reject(new Error('not media'))
         }
 
-        const timeBase = json.streams[0].time_base || '1/25'
-        const duration = json.streams[0].duration_ts || 1
+        let tb = (json.streams[0].time_base || '1/25').split('/')
+        let dur = parseFloat(json.format.duration) || 1
 
         let type = ' AUDIO '
         if (json.streams[0].pix_fmt) {
-          type = duration <= 1 ? ' STILL ' : ' MOVIE '
+          type = dur <= 1 ? ' STILL ' : ' MOVIE '
+
+          const fr = String(json.streams[0].avg_frame_rate || json.streams[0].r_frame_rate || '').split('/')
+          if (fr.length === 2) {
+            tb = [ fr[1], fr[0] ]
+          }
         }
 
         resolve([
@@ -159,8 +165,8 @@ module.exports = function ({ config, db, logger }) {
           type,
           doc.mediaSize,
           moment(doc.thumbTime).format('YYYYMMDDHHmmss'),
-          duration,
-          timeBase
+          Math.floor((dur * tb[1]) / tb[0]),
+          `${tb[0]}/${tb[1]}`
         ].join(' ') + '\r\n')
       })
     })
