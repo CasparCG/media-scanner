@@ -22,7 +22,7 @@ module.exports = function ({ config, db, logger }) {
           alwaysStat: true,
           awaitWriteFinish: {
             stabilityThreshold: 2000,
-            pollInterval: 100
+            pollInterval: 1000
           }
         }, config.scanner))
         .on('error', err => logger.error({ err }))
