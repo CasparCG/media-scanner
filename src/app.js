@@ -55,7 +55,7 @@ module.exports = function ({ db, config, logger }) {
   }))
 
   app.get('/thumbnail/generate/:id', wrap(async (req, res) => {
-    // TODO (fix) Wait for scanner?
+    // TODO (fix) Force scanner to scan and wait?
     res.send(`202 THUMBNAIL GENERATE OK\r\n`)
   }))
 
