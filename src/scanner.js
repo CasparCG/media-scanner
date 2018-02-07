@@ -76,10 +76,10 @@ module.exports = function ({ config, db, logger }) {
 
     await Promise.all([
       generateInfo(doc).catch(err => {
-        mediaLogger.error({ err })
+        mediaLogger.error({ err }, 'Info Failed')
       }),
       generateThumb(doc).catch(err => {
-        mediaLogger.error({ err })
+        mediaLogger.error({ err }, 'Thumbnail Failed')
       })
     ])
 
