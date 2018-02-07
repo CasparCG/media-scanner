@@ -119,7 +119,7 @@ module.exports = function ({ config, db, logger }) {
 
     doc._attachments = {
       'thumb.png': {
-        content_type: 'image/jpg',
+        content_type: 'image/png',
         data: (await readFileAsync(tmpPath)).toString('base64')
       }
     }
