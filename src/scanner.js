@@ -148,11 +148,11 @@ module.exports = function ({ config, db, logger }) {
         }
 
         let tb = (json.streams[0].time_base || '1/25').split('/')
-        let dur = parseFloat(json.format.duration) || 1
+        let dur = parseFloat(json.format.duration) || (1 / 24)
 
         let type = ' AUDIO '
         if (json.streams[0].pix_fmt) {
-          type = dur <= 1 ? ' STILL ' : ' MOVIE '
+          type = dur <= (1 / 24) ? ' STILL ' : ' MOVIE '
 
           const fr = String(json.streams[0].avg_frame_rate || json.streams[0].r_frame_rate || '').split('/')
           if (fr.length === 2) {
