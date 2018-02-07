@@ -150,10 +150,8 @@ module.exports = function ({ config, db, logger }) {
         const duration = json.streams[0].duration_ts || 1
 
         let type = ' AUDIO '
-        if (duration <= 1) {
-          type = ' STILL '
-        } else if (json.streams[0].pix_fmt) {
-          type = ' MOVIE '
+        if (json.streams[0].pix_fmt) {
+          type = duration <= 1 ? ' STILL ' : ' MOVIE '
         }
 
         resolve([
