@@ -6,12 +6,12 @@ const path = require('path')
 
 const defaults = {
   caspar: {
-    config: './casparcg.config'
+    // config: './casparcg.config'
   },
   paths: {
-    template: './template',
-    media: './media',
-    font: './font',
+    template: 'M:/template',
+    media: 'M:/media',
+    font: 'M:/font',
     ffmpeg: process.platform === 'win32'
       ? path.join(process.cwd(), './ffmpeg.exe')
       : 'ffmpeg',

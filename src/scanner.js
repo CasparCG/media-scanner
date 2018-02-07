@@ -34,13 +34,13 @@ module.exports = function ({ config, db, logger }) {
     .concatMap(async ([ mediaPath, mediaStat ]) => {
       const mediaId = getId(config.paths.media, mediaPath)
       try {
-        await scanFile(mediaPath, mediaId, mediaStat)
-      } catch (err) {
-        if (err.code === 'ENOENT') {
+        if (!mediaStat) {
           await db.delete(mediaId)
         } else {
-          logger.error({ err })
+          await scanFile(mediaPath, mediaId, mediaStat)
         }
+      } catch (err) {
+        logger.error({ err })
       }
     })
     .subscribe()
