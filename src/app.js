@@ -79,7 +79,12 @@ module.exports = function ({ db, config, logger }) {
 
   app.use((err, req, res, next) => {
     req.log.error({ err })
-    next(err)
+    if (!res.headersSent) {
+      res.statusCode = err.status || err.statusCode || 500
+      res.end()
+    } else {
+      res.destroy()
+    }
   })
 
   return app
