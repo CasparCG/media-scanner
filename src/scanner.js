@@ -9,6 +9,7 @@ const fs = require('fs')
 const path = require('path')
 const { getId } = require('./util')
 const Base64 = require('js-base64').Base64
+const moment = require('moment')
 
 const statAsync = util.promisify(fs.stat)
 const unlinkAsync = util.promisify(fs.unlink)
@@ -23,7 +24,7 @@ module.exports = function ({ config, db, logger }) {
           awaitWriteFinish: {
             stabilityThreshold: 2000,
             pollInterval: 100
-          },
+          }
         }, config.scanner))
         .on('error', err => logger.error({ err }))
         .on('add', (path, stat) => o.next([ path, stat ]))
@@ -112,6 +113,7 @@ module.exports = function ({ config, db, logger }) {
     doc.thumbTime = thumbStat.mtime.toISOString()
     doc.tinf = [
       `"${getId(config.paths.media, doc.mediaPath)}"`,
+      moment(doc.thumbTime).format('YYYYMMDDTHHmmss'),
       // TODO (fix) Binary or base64 size?
       doc.thumbSize
     ].join(' ') + '\r\n'
@@ -148,17 +150,18 @@ module.exports = function ({ config, db, logger }) {
         const timeBase = json.streams[0].time_base
         const duration = json.streams[0].duration_ts
 
-        let type = 'AUDIO'
+        let type = ' AUDIO '
         if (duration <= 1) {
-          type = 'STILL'
+          type = ' STILL '
         } else if (json.streams[0].pix_fmt) {
-          type = 'MOVIE'
+          type = ' MOVIE '
         }
 
         resolve([
           `"${getId(config.paths.media, doc.mediaPath)}"`,
           type,
           doc.mediaSize,
+          moment(doc.thumbTime).format('YYYYMMDDHHmmss'),
           duration,
           timeBase
         ].join(' ') + '\r\n')
