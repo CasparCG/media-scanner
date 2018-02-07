@@ -30,6 +30,7 @@ module.exports = function ({ config, db, logger }) {
         .on('unlink', (path, stat) => o.next([ path ]))
       return () => watcher.cancel()
     })
+    // TODO (perf) groupBy + mergeMap with concurrency.
     .concatMap(async ([ mediaPath, mediaStat ]) => {
       const mediaId = getId(config.paths.media, mediaPath)
       try {
