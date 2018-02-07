@@ -18,28 +18,30 @@ module.exports = function ({ db, config, logger }) {
 
     const str = rows
       .map(row => row.doc.cinf || '')
-      .reduce((acc, cinf) => acc + cinf, '')
+      .reduce((acc, inf) => acc + inf, '')
 
     res.send(`200 CLS OK\r\n${str}\r\n`)
   }))
 
   app.get('/tls', wrap(async (req, res) => {
     // TODO (perf) Use scanner?
-    const paths = await recursiveReadDirAsync(config.paths.template)
+    const rows = await recursiveReadDirAsync(config.paths.template)
 
-    const str = paths
+    const str = rows
       .filter(x => /\.(ft|wt|ct|html)$/.test(x))
-      .reduce((acc, path) => acc + `${getId(config.paths.template, path)}\r\n`, '')
+      .map(x => `${getId(config.paths.template, x)}\r\n`)
+      .reduce((acc, inf) => acc + inf, '')
 
     res.send(`200 TLS OK\r\n${str}\r\n`)
   }))
 
   app.get('/fls', wrap(async (req, res) => {
     // TODO (perf) Use scanner?
-    const paths = await recursiveReadDirAsync(config.paths.font)
+    const rows = await recursiveReadDirAsync(config.paths.font)
 
-    const str = paths
-      .reduce((acc, path) => acc + `${getId(config.paths.font, path)}\r\n`, '')
+    const str = rows
+      .map(x => `${getId(config.paths.font, x)}\r\n`)
+      .reduce((acc, inf) => acc + inf, '')
 
     res.send(`200 FLS OK\r\n${str}\r\n`)
   }))
@@ -64,7 +66,7 @@ module.exports = function ({ db, config, logger }) {
 
     const str = rows
       .map(row => row.doc.tinf || '')
-      .reduce((acc, tinf) => acc + tinf, '')
+      .reduce((acc, inf) => acc + inf, '')
 
     res.send(`200 THUMBNAIL LIST OK\r\n${str}\r\n`)
   }))
