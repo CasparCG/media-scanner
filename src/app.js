@@ -58,7 +58,7 @@ module.exports = function ({ db, config, logger }) {
 
   app.get('/cinf/:id', async (req, res, next) => {
     try {
-      let str = '200 CINF OK\r\n'
+      let str = '201 CINF OK\r\n'
       const { cinf } = await db.get(req.params.id.toUpperCase())
       str += cinf
       res.send(str)
