@@ -8,7 +8,6 @@ const os = require('os')
 const fs = require('fs')
 const path = require('path')
 const { getId } = require('./util')
-const Base64 = require('js-base64').Base64
 const moment = require('moment')
 
 const statAsync = util.promisify(fs.stat)
@@ -121,7 +120,7 @@ module.exports = function ({ config, db, logger }) {
     doc._attachments = {
       'thumb.png': {
         content_type: 'image/jpg',
-        data: Base64.encode(await readFileAsync(tmpPath))
+        data: (await readFileAsync(tmpPath)).toString('base64')
       }
     }
     await unlinkAsync(tmpPath)
