@@ -15,12 +15,11 @@ module.exports = function ({ db, config, logger }) {
     try {
       const { rows } = await db.allDocs({ include_docs: true })
 
-      let str = '200 CLS OK\r\n'
-      str += rows
+      const str = rows
         .map(row => row.doc.cinf || '')
         .reduce((acc, cinf) => acc + cinf, '')
-      str += '\r\n'
-      res.send(str)
+
+      res.send(`200 CLS OK\r\n${str}\r\n`)
     } catch (err) {
       next(err)
     }
@@ -28,15 +27,14 @@ module.exports = function ({ db, config, logger }) {
 
   app.get('/tls', async (req, res, next) => {
     try {
-      let str = '200 TLS OK\r\n'
       // TODO (perf) Use scanner?
+      let str = ''
       for (const templatePath of await recursiveReadDirAsync(config.paths.template)) {
         if (/\.(ft|wt|ct|html)$/.test(templatePath)) {
           str += `${getId(config.paths.template, templatePath)}\r\n`
         }
       }
-      str += '\r\n'
-      res.send(str)
+      res.send(`200 TLS OK\r\n${str}\r\n`)
     } catch (err) {
       next(err)
     }
@@ -44,13 +42,12 @@ module.exports = function ({ db, config, logger }) {
 
   app.get('/fls', async (req, res, next) => {
     try {
-      let str = '200 FLS OK\r\n'
       // TODO (perf) Use scanner?
+      let str = ''
       for (const fontPath of await recursiveReadDirAsync(config.paths.fonts)) {
         str += `${getId(config.paths.fonts, fontPath)}\r\n`
       }
-      str += '\r\n'
-      res.send(str)
+      res.send(`200 FLS OK\r\n${str}\r\n`)
     } catch (err) {
       next(err)
     }
@@ -58,10 +55,8 @@ module.exports = function ({ db, config, logger }) {
 
   app.get('/cinf/:id', async (req, res, next) => {
     try {
-      let str = '201 CINF OK\r\n'
       const { cinf } = await db.get(req.params.id.toUpperCase())
-      str += cinf
-      res.send(str)
+      res.send(`201 CINF OK\r\n${cinf}`)
     } catch (err) {
       next(err)
     }
@@ -70,7 +65,7 @@ module.exports = function ({ db, config, logger }) {
   app.get('/thumbnail/generate', async (req, res, next) => {
     try {
       // TODO (fix) Force scanner to scan and wait?
-      res.send('202 THUMBNAIL GENERATE_ALL OK\r\n')
+      res.send(`202 THUMBNAIL GENERATE_ALL OK\r\n`)
     } catch (err) {
       next(err)
     }
@@ -79,7 +74,7 @@ module.exports = function ({ db, config, logger }) {
   app.get('/thumbnail/generate/:id', async (req, res, next) => {
     try {
       // TODO (fix) Wait for scanner?
-      res.send('202 THUMBNAIL GENERATE OK\r\n')
+      res.send(`202 THUMBNAIL GENERATE OK\r\n`)
     } catch (err) {
       next(err)
     }
@@ -89,12 +84,11 @@ module.exports = function ({ db, config, logger }) {
     try {
       const { rows } = await db.allDocs({ include_docs: true })
 
-      let str = '200 THUMBNAIL LIST OK\r\n'
-      str += rows
+      const str = rows
         .map(row => row.doc.tinf || '')
         .reduce((acc, tinf) => acc + tinf, '')
-      str += '\r\n'
-      res.send(str)
+
+      res.send(`200 THUMBNAIL LIST OK\r\n${str}\r\n`)
     } catch (err) {
       next(err)
     }
@@ -104,10 +98,7 @@ module.exports = function ({ db, config, logger }) {
     try {
       const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true })
 
-      let str = '201 THUMBNAIL RETRIEVE OK\r\n'
-      str += _attachments['thumb.png'].data
-      str += '\r\n'
-      res.send(str)
+      res.send(`201 THUMBNAIL RETRIEVE OK\r\n${_attachments['thumb.png'].data}\r\n`)
     } catch (err) {
       next(err)
     }
