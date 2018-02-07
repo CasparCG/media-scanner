@@ -11,5 +11,7 @@ const logger = pino(Object.assign({}, config.logger, {
 }))
 const db = new PouchDB('_media')
 
+logger.info(config)
+
 scanner({ logger, db, config })
 app({ logger, db, config }).listen(config.http.port)
