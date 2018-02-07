@@ -147,7 +147,7 @@ module.exports = function ({ config, db, logger }) {
         }
 
         const timeBase = json.streams[0].time_base
-        const duration = json.streams[0].duration_ts
+        const duration = json.streams[0].duration_ts || 1
 
         let type = ' AUDIO '
         if (duration <= 1) {
