@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon ./src",
     "lint": "standard",
-    "build-win32": "nexe src/index.js -o scanner.exe"
+    "build-win32": "(rmdir /s /q dist || true) && mkdir dist && pkg -t node8-win src/index.js -o dist/scanner.exe && cp node_modules/leveldown/build/Release/leveldown.node dist/"
   },
   "author": "",
   "dependencies": {
@@ -23,8 +23,8 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "nexe": "^2.0.0-rc.24",
     "nodemon": "^1.14.12",
+    "pkg": "^4.3.0",
     "standard": "^10.0.3"
   }
 }
