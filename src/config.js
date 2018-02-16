@@ -6,7 +6,7 @@ const path = require('path')
 
 const defaults = {
   caspar: {
-    config: '../casparcg.config'
+    config: './casparcg.config'
   },
   paths: {
     template: './template',
