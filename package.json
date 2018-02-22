@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon ./src",
     "lint": "standard",
-    "build-win32": "(rmdir /s /q dist || true) && mkdir dist && pkg -t node8-win src/index.js -o dist/scanner.exe && cp node_modules/leveldown/build/Release/leveldown.node dist/"
+    "build-win32": "rmdir /s /q dist & mkdir dist && pkg -t node8-win src/index.js -o dist/scanner.exe && copy .\\node_modules\\leveldown\\build\\Release\\leveldown.node .\\dist /Y"
   },
   "author": "",
   "dependencies": {
