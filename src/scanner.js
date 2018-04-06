@@ -35,7 +35,7 @@ module.exports = function ({ config, db, logger }) {
       const mediaId = getId(config.paths.media, mediaPath)
       try {
         if (!mediaStat) {
-          await db.delete(mediaId)
+          await db.remove(await db.get(mediaId))
         } else {
           await scanFile(mediaPath, mediaId, mediaStat)
         }
