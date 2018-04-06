@@ -13,6 +13,7 @@ const statAsync = util.promisify(fs.stat)
 const unlinkAsync = util.promisify(fs.unlink)
 const readFileAsync = util.promisify(fs.readFile)
 
+var daDOC =[]
 module.exports = function ({ config, db, logger }) {
   Observable
     .create(o => {
@@ -35,7 +36,9 @@ module.exports = function ({ config, db, logger }) {
       const mediaId = getId(config.paths.media, mediaPath)
       try {
         if (!mediaStat) {
-          await db.delete(mediaId)
+          //-------------------------MVE
+          await db.get(mediaId).then((response) => {daDOC[0] = response._id ; daDOC[1] = response._rev});
+          await db.remove(daDOC[0],daDOC[1]);
         } else {
           await scanFile(mediaPath, mediaId, mediaStat)
         }
