@@ -25,6 +25,7 @@ module.exports = function ({ db, config, logger }) {
       .map(row => row.doc.cinf || '')
       .reduce((acc, inf) => acc + inf, '')
 
+    res.set('content-type', 'text/plain')
     res.send(`200 CLS OK\r\n${str}\r\n`)
   }))
 
@@ -36,7 +37,8 @@ module.exports = function ({ db, config, logger }) {
       .filter(x => /\.(ft|wt|ct|html)$/.test(x))
       .map(x => `${getId(config.paths.template, x)}\r\n`)
       .reduce((acc, inf) => acc + inf, '')
-
+    
+    res.set('content-type', 'text/plain');
     res.send(`200 TLS OK\r\n${str}\r\n`)
   }))
 
@@ -48,21 +50,25 @@ module.exports = function ({ db, config, logger }) {
       .map(x => `${getId(config.paths.font, x)}\r\n`)
       .reduce((acc, inf) => acc + inf, '')
 
+    res.set('content-type', 'text/plain')
     res.send(`200 FLS OK\r\n${str}\r\n`)
   }))
 
   app.get('/cinf/:id', wrap(async (req, res) => {
     const { cinf } = await db.get(req.params.id.toUpperCase())
+    res.set('content-type', 'text/plain')
     res.send(`201 CINF OK\r\n${cinf}`)
   }))
 
   app.get('/thumbnail/generate', wrap(async (req, res) => {
     // TODO (fix) Force scanner to scan and wait?
+    res.set('content-type', 'text/plain')
     res.send(`202 THUMBNAIL GENERATE_ALL OK\r\n`)
   }))
 
   app.get('/thumbnail/generate/:id', wrap(async (req, res) => {
     // TODO (fix) Force scanner to scan and wait?
+    res.set('content-type', 'text/plain')
     res.send(`202 THUMBNAIL GENERATE OK\r\n`)
   }))
 
@@ -73,12 +79,14 @@ module.exports = function ({ db, config, logger }) {
       .map(row => row.doc.tinf || '')
       .reduce((acc, inf) => acc + inf, '')
 
+    res.set('content-type', 'text/plain')
     res.send(`200 THUMBNAIL LIST OK\r\n${str}\r\n`)
   }))
 
   app.get('/thumbnail/:id', wrap(async (req, res) => {
     const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true })
 
+    res.set('content-type', 'text/plain')
     res.send(`201 THUMBNAIL RETRIEVE OK\r\n${_attachments['thumb.png'].data}\r\n`)
   }))
 
