@@ -14,4 +14,4 @@ const db = new PouchDB('_media')
 logger.info(config)
 
 scanner({ logger, db, config })
-app({ logger, db, config }).listen(config.http.port)
+app({ logger, db, PouchDB, config }).listen(config.http.port)

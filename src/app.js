@@ -8,10 +8,14 @@ const recursiveReadDirAsync = util.promisify(recursiveReadDir)
 
 const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
-module.exports = function ({ db, config, logger }) {
+module.exports = function ({ PouchDB, db, config, logger }) {
   const app = express()
 
   app.use(pinoHttp({ logger }))
+
+  app.use('/db', require('express-pouchdb')(PouchDB, {
+    mode: 'minimumForPouchDB'
+  }))
 
   app.get('/cls', wrap(async (req, res) => {
     const { rows } = await db.allDocs({ include_docs: true })
