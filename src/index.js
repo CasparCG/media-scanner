@@ -9,7 +9,8 @@ const logger = pino(Object.assign({}, config.logger, {
     err: pino.stdSerializers.err
   }
 }))
-const db = new PouchDB('_media')
+
+const db = new PouchDB(`http://localhost:${config.http.port}/db/_media`);
 
 logger.info(config)
 

@@ -1,5 +1,6 @@
 const express = require('express')
 const pinoHttp = require('pino-http')
+const PouchDB = require('pouchdb-node')
 const util = require('util')
 const recursiveReadDir = require('recursive-readdir')
 const { getId } = require('./util')
@@ -8,7 +9,7 @@ const recursiveReadDirAsync = util.promisify(recursiveReadDir)
 
 const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
-module.exports = function ({ PouchDB, db, config, logger }) {
+module.exports = function ({ db, config, logger }) {
   const app = express()
 
   app.use(pinoHttp({ logger }))
