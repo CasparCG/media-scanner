@@ -30,8 +30,8 @@ The built files will be placed in `./dist`, make sure you copy all files into th
 License
 -------
 
-CasparCG Media-Scanner is distributed under the GNU General Public License GPLv3 or
-higher, see [LICENSE](LICENSE.md) for details.
+CasparCG Media-Scanner is distributed under the GNU Lesser General Public License LGPLv3 or
+higher, see [LICENSE](LICENSE) for details.
 
 More information is available at http://casparcg.com/
 
