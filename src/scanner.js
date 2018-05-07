@@ -28,7 +28,7 @@ module.exports = function ({ config, db, logger }) {
         .on('add', (path, stat) => o.next([ path, stat ]))
         .on('change', (path, stat) => o.next([ path, stat ]))
         .on('unlink', (path, stat) => o.next([ path ]))
-      return () => watcher.cancel()
+      return () => watcher.close()
     })
     // TODO (perf) groupBy + mergeMap with concurrency.
     .concatMap(async ([ mediaPath, mediaStat ]) => {
@@ -44,6 +44,53 @@ module.exports = function ({ config, db, logger }) {
       }
     })
     .subscribe()
+
+  async function cleanDeleted () {
+    logger.info('Checking for dead media')
+
+    const limit = 256
+    let startkey = undefined
+    while (true) {
+      const deleted = []
+
+      const { rows } = await db.allDocs({
+        include_docs: true,
+        startkey,
+        limit
+      })
+      await Promise.all(rows.map(async ({ doc }) => {
+        try {
+          if (doc.mediaPath.indexOf(config.scanner.paths) === 0) {
+            try {
+              const stat = await statAsync(doc.mediaPath)
+              if (stat.isFile()) {
+                return
+              }
+            } catch (e) {
+              // File not found
+            }
+          }
+
+          deleted.push({
+            _id: doc._id,
+            _rev: doc._rev,
+            _deleted: true
+          })
+        } catch (err) {
+          logger.error({ err, doc })
+        }
+      }))
+      if (rows.length < limit) {
+        break
+      }
+      startkey = rows[rows.length-1].doc._id
+
+      await db.bulkDocs(deleted)
+    }
+
+    logger.info(`Finished check for dead media`)
+  }
+  cleanDeleted()
 
   async function scanFile (mediaPath, mediaId, mediaStat) {
     if (!mediaId || mediaStat.isDirectory()) {
