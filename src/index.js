@@ -9,9 +9,10 @@ const logger = pino(Object.assign({}, config.logger, {
     err: pino.stdSerializers.err
   }
 }))
-const db = new PouchDB('_media')
+
+const db = new PouchDB(`http://localhost:${config.http.port}/db/_media`);
 
 logger.info(config)
 
 scanner({ logger, db, config })
-app({ logger, db, config }).listen(config.http.port)
+app({ logger, db, PouchDB, config }).listen(config.http.port)

@@ -2,3 +2,5 @@ node_modules/
 bin/
 media/
 dist/
+pouch__all_dbs__/
+_media
