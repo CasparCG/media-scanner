@@ -18,6 +18,34 @@ module.exports = function ({ db, config, logger }) {
     mode: 'minimumForPouchDB'
   }))
 
+  app.get('/media', wrap(async (req, res) => {
+    const { rows } = await db.allDocs({ include_docs: true })
+
+    const blob = rows
+      .filter(r => r.doc.mediainfo)
+      .map(r => r.doc.mediainfo)
+
+    res.set('content-type', 'application/json')
+    res.send(blob)
+  }))
+
+  app.get('/media/info/:id', wrap(async (req, res) => {
+    const { mediainfo } = await db.get(req.params.id.toUpperCase())
+    res.set('content-type', 'application/json')
+    res.send(mediainfo || {})
+  }))
+
+  app.get('/media/thumbnail/:id', wrap(async (req, res) => {
+    const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true, binary: true })
+
+    if (!_attachments['thumb.png']) {
+      return res.status(404).end()
+    }
+
+    res.set('content-type', 'image/png')
+    res.send(_attachments['thumb.png'].data)
+  }))
+
   app.get('/cls', wrap(async (req, res) => {
     const { rows } = await db.allDocs({ include_docs: true })
 
@@ -37,8 +65,8 @@ module.exports = function ({ db, config, logger }) {
       .filter(x => /\.(ft|wt|ct|html)$/.test(x))
       .map(x => `${getId(config.paths.template, x)}\r\n`)
       .reduce((acc, inf) => acc + inf, '')
-    
-    res.set('content-type', 'text/plain');
+
+    res.set('content-type', 'text/plain')
     res.send(`200 TLS OK\r\n${str}\r\n`)
   }))
 
@@ -85,6 +113,10 @@ module.exports = function ({ db, config, logger }) {
 
   app.get('/thumbnail/:id', wrap(async (req, res) => {
     const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true })
+
+    if (!_attachments['thumb.png']) {
+      return res.status(404).end()
+    }
 
     res.set('content-type', 'text/plain')
     res.send(`201 THUMBNAIL RETRIEVE OK\r\n${_attachments['thumb.png'].data}\r\n`)
