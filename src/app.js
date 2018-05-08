@@ -2,6 +2,7 @@ const express = require('express')
 const pinoHttp = require('pino-http')
 const PouchDB = require('pouchdb-node')
 const util = require('util')
+const path = require('path')
 const recursiveReadDir = require('recursive-readdir')
 const { getId } = require('./util')
 
@@ -16,6 +17,12 @@ module.exports = function ({ db, config, logger }) {
 
   app.use('/db', require('express-pouchdb')(PouchDB, {
     mode: 'minimumForPouchDB'
+  }))
+
+  app.get('/media/preview/:id', wrap(async (req, res) => {
+    const { previewPath } = await db.get(req.params.id.toUpperCase())
+
+    res.sendFile(path.join(process.cwd(), previewPath))
   }))
 
   app.get('/cls', wrap(async (req, res) => {

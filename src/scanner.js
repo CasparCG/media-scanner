@@ -6,7 +6,7 @@ const mkdirp = require('mkdirp-promise')
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
-const { getId } = require('./util')
+const { getId, fileExists } = require('./util')
 const moment = require('moment')
 
 const statAsync = util.promisify(fs.stat)
@@ -60,15 +60,8 @@ module.exports = function ({ config, db, logger }) {
       })
       await Promise.all(rows.map(async ({ doc }) => {
         try {
-          if (doc.mediaPath.indexOf(config.scanner.paths) === 0) {
-            try {
-              const stat = await statAsync(doc.mediaPath)
-              if (stat.isFile()) {
-                return
-              }
-            } catch (e) {
-              // File not found
-            }
+          if (doc.mediaPath.indexOf(config.scanner.paths) === 0 && await fileExists(doc.mediaPath)) {
+            return
           }
 
           deleted.push({
