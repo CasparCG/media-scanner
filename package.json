@@ -2,7 +2,7 @@
   "name": "scanner",
   "version": "1.0.0",
   "description": "",
-  "license" : "LGPL-3.0",
+  "license": "LGPL-3.0",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon ./src",
@@ -14,6 +14,7 @@
   "dependencies": {
     "@reactivex/rxjs": "^5.5.6",
     "chokidar": "^2.0.0",
+    "cors": "^2.8.4",
     "express": "^4.16.2",
     "express-pouchdb": "^4.0.0",
     "mkdirp-promise": "^5.0.1",

@@ -157,7 +157,7 @@ module.exports = function ({ config, db, logger }) {
 
     const thumbStat = await statAsync(tmpPath)
     doc.thumbSize = thumbStat.size
-    doc.thumbTime = thumbStat.mtime.toISOString()
+    doc.thumbTime = thumbStat.mtime.getTime()
     doc.tinf = [
       `"${getId(config.paths.media, doc.mediaPath)}"`,
       moment(doc.thumbTime).format('YYYYMMDDTHHmmss'),
