@@ -201,7 +201,7 @@ module.exports = function ({ config, db, logger }) {
 
     doc.cinf = generateCinf(doc, json)
 
-    if (config.metadata.enhanced) {
+    if (config.metadata !== null) {
       doc.mediainfo = await generateMediainfo(doc, json)
     }
   }
@@ -251,8 +251,8 @@ module.exports = function ({ config, db, logger }) {
           return reject(err)
         }
 
-        var regex2 = /Multi frame detection: TFF:\s+(\d+)\s+BFF:\s+(\d+)\s+Progressive:\s+(\d+)/
-        const res = regex2.exec(stderr)
+        const resultRegex = /Multi frame detection: TFF:\s+(\d+)\s+BFF:\s+(\d+)\s+Progressive:\s+(\d+)/
+        const res = resultRegex.exec(stderr)
         if (res === null) {
           return resolve('unknown')
         }

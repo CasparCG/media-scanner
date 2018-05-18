@@ -39,7 +39,7 @@ db.changes({
 ```
 
 ### Enhanced Metadata
-These endpoints provide additional metadata on media in a json format. They are only available if `metadata.enhanced` is enabled in the config.
+These endpoints provide additional metadata on media in a json format.
 
 * `/media` - Lists available media files in json form with an enhanced set of metadata
 * `/media/info/<name>` - Gets the json enhanced metadata for the specified media file
