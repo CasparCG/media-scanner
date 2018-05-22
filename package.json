@@ -7,8 +7,11 @@
   "scripts": {
     "dev": "nodemon ./src",
     "lint": "standard",
-    "build-linux": "(rm -rf dist || true) && pkg -t node8-linux src/index.js -o dist/scanner && cp ./node_modules/leveldown/build/Release/leveldown.node ./dist",
-    "build-win32": "rmdir /s /q dist & mkdir dist && pkg -t node8-win src/index.js -o dist/scanner.exe && copy .\\node_modules\\leveldown\\build\\Release\\leveldown.node .\\dist /Y"
+    "remove-fauxton-package": "json -I -f node_modules/express-pouchdb/package.json -e \"this.dependencies[\\\"pouchdb-fauxton\\\"] = undefined\"",
+    "remove-fauxton-win32": "npm run remove-fauxton-package && del node_modules\\express-pouchdb\\lib\\routes\\fauxton.js",
+    "remove-fauxton-linux": "npm run remove-fauxton-package && (rm node_modules/express-pouchdb/lib/routes/fauxton.js || true)",
+    "build-linux": "(rm -rf dist || true) && npm run remove-fauxton-linux && pkg -t node8-linux src/index.js -o dist/scanner && cp ./node_modules/leveldown/build/Release/leveldown.node ./dist",
+    "build-win32": "rmdir /s /q dist & mkdir dist && npm run remove-fauxton-win32 && pkg -t node8-win src/index.js -o dist/scanner.exe && copy .\\node_modules\\leveldown\\build\\Release\\leveldown.node .\\dist /Y"
   },
   "author": "",
   "dependencies": {
@@ -26,6 +29,7 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
+    "json": "^9.0.6",
     "nodemon": "^1.14.12",
     "pkg": "^4.3.0",
     "standard": "^10.0.3"
