@@ -8,6 +8,16 @@ Usage
 
 This project is designed to be used via the AMCP protocol in CasparCG server. However, there are some endpoints for additional data which can only be access directly over http.
 
+### Configuration
+There are various options that can be changed for the scanner. These can all be set by environment variables or as arguments.
+Some features are disabled by default and should be enabled in this way.
+
+To change options with arguments use the following syntax: `scanner.exe --metadata.scenes true --metadata.sceneThreshold 0.5`
+
+The full set of available options and their default values can be found at [config.js](src/config.js)
+
+By default the scanner expects there to be a casparcg.config file next to the executable to specify the paths to media. To disable use of this file `scanner.exe --caspar null`
+
 ### AMCP Endpoints
 These endpoints are exposed by the AMCP protocol in CasparCG Server. This means that they have some AMCP syntax wrappings, which will likely need to be stripped off if using in an external client
 
