@@ -40,6 +40,16 @@ module.exports = function ({ db, config, logger }) {
     res.send(`200 TLS OK\r\n${str}\r\n`)
   }))
 
+ app.get('/path_template', wrap(async (req, res) => {
+    const str = (config.paths.template)
+    res.send(`200 path_template OK\r\n${str}\r\n`)
+  })) 
+  
+  app.get('/path_media', wrap(async (req, res) => {
+    const str = (config.paths.media)
+    res.send(`200 path_media OK\r\n${str}\r\n`)
+  })) 
+  
   app.get('/fls', wrap(async (req, res) => {
     // TODO (perf) Use scanner?
     const rows = await recursiveReadDirAsync(config.paths.font)
