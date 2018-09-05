@@ -74,14 +74,8 @@ higher, see [LICENSE](LICENSE) for details.
 More information is available at http://casparcg.com/
 
 
-More information about CasparCG is available at http://casparcg.com/ and
-in the forum at http://casparcg.com/forum/
-
-
 Documentation
 -------------
 
 The most up-to-date documentation is always available at
-https://github.com/CasparCG/Server/wiki
-
-Ask questions in the forum: http://casparcg.com/forum/
+https://github.com/CasparCG/help/wiki
