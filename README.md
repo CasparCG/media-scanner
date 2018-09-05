@@ -38,6 +38,10 @@ db.changes({
 });
 ```
 
+### Preview Videos
+This tool is able to generate low resolution webm preview videos of all media, intended to be used in web based clients.
+They are generated in the background after the media is found or detected to have changed, so may not be available immediately.
+They can be accessed via the following url format `/media/preview/<name>`
 
 Development
 -----------

@@ -23,6 +23,12 @@ const defaults = {
     width: 256,
     height: -1
   },
+  previews: {
+    enable: false,
+    width: 160,
+    height: -1,
+    bitrate: '40k'
+  },
   isProduction: process.env.NODE_ENV === 'production',
   logger: {
     level: process.env.NODE_ENV === 'production' ? 'info' : 'trace',

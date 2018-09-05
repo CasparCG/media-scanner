@@ -3,4 +3,5 @@ bin/
 media/
 dist/
 pouch__all_dbs__/
+_previews/
 _media
