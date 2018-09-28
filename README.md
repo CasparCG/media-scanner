@@ -38,6 +38,13 @@ db.changes({
 });
 ```
 
+### Enhanced Metadata
+These endpoints provide additional metadata on media in a json format.
+
+* `/media` - Lists available media files in json form with an enhanced set of metadata
+* `/media/info/<name>` - Gets the json enhanced metadata for the specified media file
+* `/media/thumbnail/<name>` - Gets the thumbnail for a media file
+
 
 Development
 -----------
