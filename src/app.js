@@ -37,7 +37,7 @@ module.exports = function ({ db, config, logger }) {
       .filter(x => /\.(ft|wt|ct|html)$/.test(x))
 
     if (config.http.responseFormat === 'JSON' || config.http.responseFormat === 'XML') {
-      res.send(formatOutput(str, 'TLS', config.http.responseFormat, config) + "\r\n")
+      res.send(formatOutput(str, 'TLS', config.http.responseFormat, config))
     } else {
       const data = str.map(x => `${getId(config.paths.template, x)}\r\n`)
       .reduce((acc, inf) => acc + inf, '')
