@@ -30,7 +30,8 @@ const defaults = {
     prettyPrint: process.env.NODE_ENV !== 'production'
   },
   http: {
-    port: 8000
+    port: 8000,
+    responseFormat: "SDL"
   }
 }
 
@@ -49,6 +50,9 @@ if (config.caspar && config.caspar.config) {
     }
     for (const path in result.configuration.paths[0]) {
       config.paths[path.split('-')[0]] = result.configuration.paths[0][path][0]
+    }
+    if (result.configuration.amcp[0]['media-server'][0]['response-format'][0] !== undefined) {
+      config.http.responseFormat = result.configuration.amcp[0]['media-server'][0]['response-format'][0].toUpperCase()
     }
   })
 }
