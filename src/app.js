@@ -4,6 +4,7 @@ const PouchDB = require('pouchdb-node')
 const util = require('util')
 const recursiveReadDir = require('recursive-readdir')
 const { getId } = require('./util')
+const { formatOutput } = require('./formatter')
 
 const recursiveReadDirAsync = util.promisify(recursiveReadDir)
 
@@ -25,7 +26,7 @@ module.exports = function ({ db, config, logger }) {
       .map(row => row.doc.cinf || '')
       .reduce((acc, inf) => acc + inf, '')
 
-    res.send(`200 CLS OK\r\n${str}\r\n`)
+    res.send(formatOutput(str, 'CLS', config.http.responseFormat, config))
   }))
 
   app.get('/tls', wrap(async (req, res) => {
@@ -34,21 +35,30 @@ module.exports = function ({ db, config, logger }) {
 
     const str = rows
       .filter(x => /\.(ft|wt|ct|html)$/.test(x))
-      .map(x => `${getId(config.paths.template, x)}\r\n`)
+
+    if (config.http.responseFormat === 'JSON' || config.http.responseFormat === 'XML') {
+      res.send(formatOutput(str, 'TLS', config.http.responseFormat, config) + "\r\n")
+    } else {
+      const data = str.map(x => `${getId(config.paths.template, x)}\r\n`)
       .reduce((acc, inf) => acc + inf, '')
 
-    res.send(`200 TLS OK\r\n${str}\r\n`)
+      res.send(`200 TLS OK\r\n${data}\r\n`)
+    }
   }))
 
   app.get('/fls', wrap(async (req, res) => {
     // TODO (perf) Use scanner?
     const rows = await recursiveReadDirAsync(config.paths.font)
 
-    const str = rows
-      .map(x => `${getId(config.paths.font, x)}\r\n`)
-      .reduce((acc, inf) => acc + inf, '')
+    if (config.http.responseFormat === 'JSON' || config.http.responseFormat === 'XML') {
+      res.send(formatOutput(rows, 'FLS', config.http.responseFormat, config))
+    } else {
+      const str = rows
+        .map(x => `${getId(config.paths.font, x)}\r\n`)
+        .reduce((acc, inf) => acc + inf, '')
 
-    res.send(`200 FLS OK\r\n${str}\r\n`)
+      res.send(`200 FLS OK\r\n${str}\r\n`)
+    }
   }))
 
   app.get('/cinf/:id', wrap(async (req, res) => {
