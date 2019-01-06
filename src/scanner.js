@@ -201,11 +201,15 @@ module.exports = function ({ config, db, logger }) {
 
         let type = ' AUDIO '
         if (json.streams[0].pix_fmt) {
-          type = dur <= (1 / 24) ? ' STILL ' : ' MOVIE '
-
-          const fr = String(json.streams[0].avg_frame_rate || json.streams[0].r_frame_rate || '').split('/')
-          if (fr.length === 2) {
-            tb = [ fr[1], fr[0] ]
+          if (dur <= (1 / 24)) {
+            type = ' STILL '
+            tb = [0,1]
+          } else {
+            type = ' MOVIE '
+            const fr = String(json.streams[0].avg_frame_rate || json.streams[0].r_frame_rate || '').split('/')
+            if (fr.length === 2) {
+              tb = [ fr[1], fr[0] ]
+            }
           }
         }
 
@@ -214,7 +218,7 @@ module.exports = function ({ config, db, logger }) {
           type,
           doc.mediaSize,
           moment(doc.thumbTime).format('YYYYMMDDHHmmss'),
-          Math.floor((dur * tb[1]) / tb[0]),
+          tb[0] === 0 ? 0 : Math.floor((dur * tb[1]) / tb[0]),
           `${tb[0]}/${tb[1]}`
         ].join(' ') + '\r\n')
       })
