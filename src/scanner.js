@@ -277,6 +277,9 @@ module.exports = function ({ config, db, logger }) {
 
     return {
       name: doc._id,
+      path: doc.mediaPath,
+      size: doc.mediaSize,
+      time: doc.mediaTime,
       field_order: fieldOrder,
 
       streams: json.streams.map(s => ({
