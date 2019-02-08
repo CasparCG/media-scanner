@@ -206,9 +206,9 @@ module.exports = function ({ db, config, logger }) {
   }))
 
   app.use((err, req, res, next) => {
-    req.log.error({ err })
+    if (err) req.log.error({ err })
     if (!res.headersSent) {
-      res.statusCode = err.status || err.statusCode || 500
+      res.statusCode = err ? err.status || err.statusCode || 500 : 500
       res.end()
     } else {
       res.destroy()
