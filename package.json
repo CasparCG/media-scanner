@@ -31,7 +31,7 @@
   "devDependencies": {
     "json": "^9.0.6",
     "nodemon": "^1.18.9",
-    "pkg": "^4.3.7",
+    "pkg": "4.3.0",
     "standard": "^10.0.3"
   }
 }
