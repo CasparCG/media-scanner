@@ -202,15 +202,15 @@ module.exports = function ({ config, db, logger }) {
 
         let type = ' AUDIO '
 
-        for (let stream in json.streams) {
-          if (json.streams[stream].pix_fmt) {
+        for (let stream of json.streams) {
+          if (stream.pix_fmt) {
             type = dur <= (1 / 24) ? ' STILL ' : ' MOVIE '
-            const fr = String(json.streams[stream].avg_frame_rate || json.streams[stream].r_frame_rate || '').split('/')
+            const fr = String(stream.avg_frame_rate || stream.r_frame_rate || '').split('/')
             if (fr.length === 2) {
               tb = [ fr[1], fr[0] ]
             }
             break
-		  }
+          }
         }
 
         resolve([
