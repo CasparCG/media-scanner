@@ -26,7 +26,11 @@ module.exports = function ({ db, config, logger }) {
 
     const blob = rows
       .filter(r => r.doc.mediainfo)
-      .map(r => r.doc.mediainfo)
+      .map(r => ({
+        ...r.doc.mediainfo,
+        mediaSize: r.doc.mediaSize,
+        mediaTime: r.doc.mediaTime
+      }))
 
     res.set('content-type', 'application/json')
     res.send(blob)
