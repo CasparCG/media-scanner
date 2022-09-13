@@ -1,8 +1,9 @@
 const cp = require('child_process')
-const { Observable } = require('@reactivex/rxjs')
+const { Observable } = require('rxjs')
+const { concatMap } = require('rxjs/operators');
 const util = require('util')
 const chokidar = require('chokidar')
-const mkdirp = require('mkdirp-promise')
+const mkdirp = require('mkdirp')
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
@@ -31,18 +32,20 @@ module.exports = function ({ config, db, logger }) {
       return () => watcher.close()
     })
     // TODO (perf) groupBy + mergeMap with concurrency.
-    .concatMap(async ([ mediaPath, mediaStat ]) => {
-      const mediaId = getId(config.paths.media, mediaPath)
-      try {
-        if (!mediaStat) {
-          await db.remove(await db.get(mediaId))
-        } else {
-          await scanFile(mediaPath, mediaId, mediaStat)
+    .pipe(
+      concatMap(async ([ mediaPath, mediaStat ]) => {
+        const mediaId = getId(config.paths.media, mediaPath)
+        try {
+          if (!mediaStat) {
+            await db.remove(await db.get(mediaId))
+          } else {
+            await scanFile(mediaPath, mediaId, mediaStat)
+          }
+        } catch (err) {
+          logger.error({ err })
         }
-      } catch (err) {
-        logger.error({ err })
-      }
-    })
+      })
+    )
     .subscribe()
 
   async function cleanDeleted () {
@@ -145,7 +148,7 @@ module.exports = function ({ config, db, logger }) {
       config.paths.ffmpeg,
       '-hide_banner',
       '-i', `"${doc.mediaPath}"`,
-      '-vf select=gt(scene\,0.4)',
+      '-vf select=gt\\(scene\,0.4\\)',
       `-vf scale=${config.thumbnails.width}:${config.thumbnails.height}`,
       '-frames:v 1',
       '-threads 1',
