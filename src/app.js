@@ -3,11 +3,14 @@ const pinoHttp = require('pino-http')
 const PouchDB = require('pouchdb-node')
 const util = require('util')
 const recursiveReadDir = require('recursive-readdir')
-const { getId } = require('./util')
+const { getId, getGDDScriptElement, extractGDDJSON } = require('./util')
 
 const recursiveReadDirAsync = util.promisify(recursiveReadDir)
 
 const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+
+const anyTemplateType = /\.(ft|wt|ct|html)$/
+const htmlTemplateType = /\.html$/
 
 module.exports = function ({ db, config, logger }) {
   const app = express()
@@ -30,13 +33,71 @@ module.exports = function ({ db, config, logger }) {
 
   app.get('/tls', wrap(async (req, res) => {
     // TODO (perf) Use scanner?
-    const rows = await recursiveReadDirAsync(config.paths.template)
 
-    const str = rows
-      .filter(x => /\.(ft|wt|ct|html)$/.test(x))
-      .map(x => `${getId(config.paths.template, x)}\r\n`)
-      .reduce((acc, inf) => acc + inf, '')
+    // List all files in the templates dir
+    const files = await recursiveReadDirAsync(config.paths.template)
+    
+    // Categorize HTML templates separately,
+    // because they have features that other template types do not.
+    const htmlTemplates = []
+    const otherTemplates = []
+    for (const file of files) {
+      if (anyTemplateType.test(file)) {
+        if (htmlTemplateType.test(file)) {
+          htmlTemplates.push(file)
+        } else {
+          otherTemplates.push(file)
+        }
+      }
+    }
 
+    // Extract any Graphics Data Defintions (GDD) from HTML templates.
+    // The extraction is done async in a non-blocking manner.
+    const gddExtractionPromises = []
+    for (const template of htmlTemplates) {
+      const promise = new Promise(async (resolve, reject) => {
+        try {
+          const info = {
+            id: getId(config.paths.template, template),
+          }
+          const gddScriptElement = await getGDDScriptElement(template)
+          if (gddScriptElement) {
+            info.gdd = await extractGDDJSON(template, gddScriptElement)
+          }
+          resolve(info)
+        } catch (error) {
+          reject(error)
+        }
+      })
+      gddExtractionPromises.push(promise)
+    }
+
+    // Gather the TLS response info for all templates.
+    const htmlTemplatesInfo = await Promise.all(gddExtractionPromises)
+    const otherTemplatesInfo = otherTemplates.map((x) => {
+      const info = {
+        id: getId(config.paths.template, x),
+      }
+      return info
+    })
+
+    // Create the final response string.
+    const str = JSON.stringify({
+      templates: htmlTemplatesInfo
+        .concat(otherTemplatesInfo)
+        .sort((a, b) => {
+          // Sort alphabetically
+          if (a.id < b.id) {
+            return -1
+          } else if (a.id > b.id) {
+            return 1
+          } else {
+            return 0
+          }
+        })
+    })
+
+    // Send the response.
     res.send(`200 TLS OK\r\n${str}\r\n`)
   }))
 
