@@ -40,7 +40,7 @@ module.exports = function ({ db, config, logger }) {
 
     res.send(`200 TLS OK\r\n${str}\r\n`)
   }))
-  app.get('/tls-json', wrap(async (req, res) => {
+  app.get('/templates', wrap(async (req, res) => {
     // TODO (perf) Use scanner?
 
     // List all files in the templates dir
@@ -117,6 +117,7 @@ module.exports = function ({ db, config, logger }) {
     })
 
     // Send the response.
+    res.set('content-type', 'application/json')
     res.send(str)
   }))
 
