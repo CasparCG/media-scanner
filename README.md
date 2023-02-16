@@ -19,6 +19,7 @@ These endpoints are exposed by the AMCP protocol in CasparCG Server. This means 
 * `/thumbnail/generate/<name>` - Backwards compatibility, has no effect
 * `/thumbnail` - Lists the available thumbnails
 * `/thumbnail/<name>` - Gets the thumbnail for a media file
+* `/templates` - Detailed list of templates in JSON format.
 
 ### Changes
 A stream of changes can be accessed with the following. [Full docs](https://pouchdb.com/api.html#changes)
