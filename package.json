@@ -31,8 +31,7 @@
   },
   "devDependencies": {
     "json": "^11.0.0",
-    "leveldown": "^6.1.1",
-    "nodemon": "2.0.19",
+    "nodemon": "^2.0.19",
     "pkg": "5.8.0",
     "standard": "^17.0.0"
   }
