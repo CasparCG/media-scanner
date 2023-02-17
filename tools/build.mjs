@@ -1,6 +1,7 @@
 import * as fs from "fs/promises";
 import rimraf from "rimraf";
 import cp from "child_process";
+import zipAFolder from "zip-a-folder";
 
 const platform = process.argv[2] || process.platform;
 const arch = process.argv[3] || process.arch;
@@ -31,3 +32,18 @@ await fs.cp(
   `dist/prebuilds/${platform}-${arch}`,
   { recursive: true }
 );
+
+// Create zip
+const packageJson = await fs.readFile("./package.json");
+const pkg = JSON.parse(packageJson);
+const version = pkg.version;
+
+const packageName = "casparcg-scanner";
+const zipFileName = `${packageName}-v${version}-${platform}-${arch}.zip`;
+
+const err = await zipAFolder.zip("./dist", `./${zipFileName}`);
+if (err) {
+  throw new Error(err);
+}
+
+await fs.rename(`./${zipFileName}`, `./dist/${zipFileName}`);
