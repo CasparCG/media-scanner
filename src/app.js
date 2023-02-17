@@ -3,11 +3,12 @@ const pinoHttp = require('pino-http')
 const PouchDB = require('pouchdb-node')
 const util = require('util')
 const recursiveReadDir = require('recursive-readdir')
-const { getId } = require('./util')
+const { getId, getGDDScriptElement, extractGDDJSON } = require('./util')
 
 const recursiveReadDirAsync = util.promisify(recursiveReadDir)
 
 const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+
 
 module.exports = function ({ db, config, logger }) {
   const app = express()
@@ -38,6 +39,86 @@ module.exports = function ({ db, config, logger }) {
       .reduce((acc, inf) => acc + inf, '')
 
     res.send(`200 TLS OK\r\n${str}\r\n`)
+  }))
+  app.get('/templates', wrap(async (req, res) => {
+    // TODO (perf) Use scanner?
+
+    // List all files in the templates dir
+    const files = await recursiveReadDirAsync(config.paths.template)
+
+    // Categorize HTML templates separately,
+    // because they have features that other template types do not.
+    const htmlTemplates = []
+    const otherTemplates = []
+    for (const filePath of files) {
+      {
+        // Find HTML-based templates:
+        const m = filePath.match(/\.(html|htm)$/)
+        if (m) {
+          htmlTemplates.push({filePath, type: 'html'})
+          continue
+        }
+      }
+      {
+        // Find other (eg flash) templates:
+        const m = filePath.match(/\.(ft|wt|ct|swf)$/)
+        if (m) {
+          otherTemplates.push({filePath, type: m[1]})
+          continue
+        }
+      }
+    }
+
+    // Extract any Graphics Data Defintions (GDD) from HTML templates.
+    const htmlTemplatesInfo = await Promise.all(htmlTemplates.map(async ({filePath, type}) => {
+      const info = {
+        id: getId(config.paths.template, filePath),
+        path: filePath,
+        type
+      }
+      try {
+        const gddScriptElement = await getGDDScriptElement(filePath)
+        if (gddScriptElement) {
+          info.gdd = await extractGDDJSON(filePath, gddScriptElement)
+        }
+      } catch (error) {
+        info.error = error + ''
+        console.error(error)
+      }
+      return info
+    }))
+
+    // Gather the info for all templates:
+    const otherTemplatesInfo = otherTemplates.map(({filePath, type}) => {
+      return {
+        id: getId(config.paths.template, filePath),
+        path: filePath,
+        type
+      }
+    })
+
+    const allTemplates = htmlTemplatesInfo
+      .concat(otherTemplatesInfo)
+      .sort((a, b) => {
+        // Sort alphabetically
+        if (a.id < b.id) {
+          return -1
+        } else if (a.id > b.id) {
+          return 1
+        } else {
+          return 0
+        }
+      })
+
+    // Create the final response string.
+    const str = JSON.stringify({
+      templates: allTemplates
+
+    })
+
+    // Send the response.
+    res.set('content-type', 'application/json')
+    res.send(str)
   }))
 
   app.get('/fls', wrap(async (req, res) => {
