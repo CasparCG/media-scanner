@@ -31,7 +31,7 @@ const defaults = {
   logger: {
     level: process.env.NODE_ENV === 'production' ? 'info' : 'trace',
     name: pkg.name,
-    prettyPrint: process.env.NODE_ENV !== 'production'
+    print: process.env.NODE_ENV !== 'production'
   },
   http: {
     port: 8000

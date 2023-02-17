@@ -1,8 +1,9 @@
 const cp = require('child_process')
-const { Observable } = require('@reactivex/rxjs')
+const { Observable } = require('rxjs')
+const { concatMap } = require('rxjs/operators');
 const util = require('util')
 const chokidar = require('chokidar')
-const mkdirp = require('mkdirp-promise')
+const mkdirp = require('mkdirp')
 const os = require('os')
 const fs = require('fs')
 const path = require('path')
@@ -31,18 +32,20 @@ module.exports = function ({ config, db, logger }) {
       return () => watcher.close()
     })
     // TODO (perf) groupBy + mergeMap with concurrency.
-    .concatMap(async ([ mediaPath, mediaStat ]) => {
-      const mediaId = getId(config.paths.media, mediaPath)
-      try {
-        if (!mediaStat) {
-          await db.remove(await db.get(mediaId))
-        } else {
-          await scanFile(mediaPath, mediaId, mediaStat)
+    .pipe(
+      concatMap(async ([ mediaPath, mediaStat ]) => {
+        const mediaId = getId(config.paths.media, mediaPath)
+        try {
+          if (!mediaStat) {
+            await db.remove(await db.get(mediaId))
+          } else {
+            await scanFile(mediaPath, mediaId, mediaStat)
+          }
+        } catch (err) {
+          logger.error({ err })
         }
-      } catch (err) {
-        logger.error({ err })
-      }
-    })
+      })
+    )
     .subscribe()
 
   async function cleanDeleted () {
@@ -60,7 +63,9 @@ module.exports = function ({ config, db, logger }) {
       })
       await Promise.all(rows.map(async ({ doc }) => {
         try {
-          if (doc.mediaPath.indexOf(config.scanner.paths) === 0) {
+          const mediaFolder = path.normalize(config.scanner.paths)
+          const mediaPath = path.normalize(doc.mediaPath)
+          if (mediaPath.indexOf(mediaFolder) === 0) {
             try {
               const stat = await statAsync(doc.mediaPath)
               if (stat.isFile()) {
@@ -144,8 +149,9 @@ module.exports = function ({ config, db, logger }) {
       config.paths.ffmpeg,
       '-hide_banner',
       '-i', `"${doc.mediaPath}"`,
+      '-vf select=gt\\(scene\,0.4\\)',
+      `-vf scale=${config.thumbnails.width}:${config.thumbnails.height}`,
       '-frames:v 1',
-      `-vf thumbnail,scale=${config.thumbnails.width}:${config.thumbnails.height}`,
       '-threads 1',
       tmpPath
     ]
@@ -212,11 +218,15 @@ module.exports = function ({ config, db, logger }) {
 
     let type = ' AUDIO '
     if (json.streams[0].pix_fmt) {
-      type = dur <= (1 / 24) ? ' STILL ' : ' MOVIE '
-
-      const fr = String(json.streams[0].avg_frame_rate || json.streams[0].r_frame_rate || '').split('/')
-      if (fr.length === 2) {
-        tb = [ fr[1], fr[0] ]
+      if (dur <= (1 / 24)) {
+        type = ' STILL '
+        tb = [0,1]
+      } else {
+        type = ' MOVIE '
+        const fr = String(json.streams[0].avg_frame_rate || json.streams[0].r_frame_rate || '').split('/')
+        if (fr.length === 2) {
+          tb = [ fr[1], fr[0] ]
+        }
       }
     }
 
@@ -225,7 +235,7 @@ module.exports = function ({ config, db, logger }) {
       type,
       doc.mediaSize,
       moment(doc.thumbTime).format('YYYYMMDDHHmmss'),
-      Math.floor((dur * tb[1]) / tb[0]) || 0,
+      tb[0] === 0 ? 0 : Math.floor((dur * tb[1]) / tb[0]),
       `${tb[0]}/${tb[1]}`
     ].join(' ') + '\r\n'
   }

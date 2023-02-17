@@ -7,28 +7,31 @@
   "scripts": {
     "dev": "nodemon ./src",
     "lint": "standard",
-    "build-linux": "(rm -rf dist || true) && pkg -t node8-linux src/index.js -o dist/scanner && cp ./node_modules/leveldown/build/Release/leveldown.node ./dist",
-    "build-win32": "rmdir /s /q dist & mkdir dist && pkg -t node8-win src/index.js -o dist/scanner.exe && copy .\\node_modules\\leveldown\\build\\Release\\leveldown.node .\\dist /Y"
+    "build-linux-arm64": "node tools/build.mjs linux arm64",
+    "build-linux-x64": "node tools/build.mjs linux x64",
+    "build-win32-x64": "node tools/build.mjs win32 x64"
   },
   "author": "",
   "dependencies": {
-    "@reactivex/rxjs": "^5.5.6",
-    "chokidar": "^2.0.0",
+    "cheerio": "^1.0.0-rc.12",
+    "chokidar": "^3.5.3",
     "cors": "^2.8.4",
-    "express": "^4.16.2",
-    "express-pouchdb": "^4.0.0",
-    "mkdirp-promise": "^5.0.1",
-    "moment": "^2.20.1",
-    "nconf": "^0.10.0",
-    "pino": "^4.10.4",
+    "express": "^4.18.1",
+    "express-pouchdb": "^4.2.0",
+    "mkdirp": "^1.0.1",
+    "moment": "^2.29.1",
+    "nconf": "^0.12.0",
+    "pino": "^8.5.0",
     "pino-http": "^3.1.0",
-    "pouchdb-node": "^6.4.3",
-    "recursive-readdir": "^2.2.1",
-    "xml2js": "^0.4.19"
+    "pouchdb-node": "^7.3.0",
+    "recursive-readdir": "^2.2.2",
+    "rxjs": "^7.5.6",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "nodemon": "^1.14.12",
-    "pkg": "^4.3.0",
-    "standard": "^10.0.3"
+    "nodemon": "^2.0.19",
+    "pkg": "5.8.0",
+    "rimraf": "^4.1.2",
+    "standard": "^17.0.0"
   }
 }

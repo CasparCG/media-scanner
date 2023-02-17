@@ -19,6 +19,10 @@ These endpoints are exposed by the AMCP protocol in CasparCG Server. This means 
 * `/thumbnail/generate/<name>` - Backwards compatibility, has no effect
 * `/thumbnail` - Lists the available thumbnails
 * `/thumbnail/<name>` - Gets the thumbnail for a media file
+* `/templates` - Detailed list of templates in JSON format.
+* `/media` - Lists available media files in json form with an enhanced set of metadata
+* `/media/info/<name>` - Gets the json enhanced metadata for the specified media file
+* `/media/thumbnail/<name>` - Gets the thumbnail for a media file
 
 ### Changes
 A stream of changes can be accessed with the following. [Full docs](https://pouchdb.com/api.html#changes)
@@ -38,18 +42,10 @@ db.changes({
 });
 ```
 
-### Enhanced Metadata
-These endpoints provide additional metadata on media in a json format.
-
-* `/media` - Lists available media files in json form with an enhanced set of metadata
-* `/media/info/<name>` - Gets the json enhanced metadata for the specified media file
-* `/media/thumbnail/<name>` - Gets the thumbnail for a media file
-
-
 Development
 -----------
 
-This project uses the latest LTS version NodeJS (8), so you need that installed. Get it from: https://nodejs.org/en/. 
+This project uses the latest LTS version NodeJS (18), so you need that installed. Get it from: https://nodejs.org/en/. 
 We also use Leveldown which uses native modules so if you're on Windows you need to install windows build tools:
 
 `npm install --global --production windows-build-tools`
@@ -70,6 +66,8 @@ Be aware that because of the native extensions, you can only build for the targe
   
 The built files will be placed in `./dist`, make sure you copy all files into the main CasparCG directory.
 
+Note: Due to an incompatability with a dependency and pkg, a fix up step is performed during build until this is resolved upstream [pkg](https://github.com/zeit/pkg/issues/75) [express-pouchdb](https://github.com/pouchdb/pouchdb-server/issues/326). This could cause issues when updating the express-pouchdb package.
+
 License
 -------
 
@@ -79,14 +77,8 @@ higher, see [LICENSE](LICENSE) for details.
 More information is available at http://casparcg.com/
 
 
-More information about CasparCG is available at http://casparcg.com/ and
-in the forum at http://casparcg.com/forum/
-
-
 Documentation
 -------------
 
 The most up-to-date documentation is always available at
-https://github.com/CasparCG/Server/wiki
-
-Ask questions in the forum: http://casparcg.com/forum/
+https://github.com/CasparCG/help/wiki
