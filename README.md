@@ -8,6 +8,16 @@ Usage
 
 This project is designed to be used via the AMCP protocol in CasparCG server. However, there are some endpoints for additional data which can only be access directly over http.
 
+### Configuration
+There are various options that can be changed for the scanner. These can all be set by environment variables or as arguments.
+Some features are disabled by default and should be enabled in this way.
+
+To change options with arguments use the following syntax: `scanner.exe --metadata.scenes true --metadata.sceneThreshold 0.5`
+
+The full set of available options and their default values can be found at [config.js](src/config.js)
+
+By default the scanner expects there to be a casparcg.config file next to the executable to specify the paths to media. To disable use of this file `scanner.exe --caspar null`
+
 ### AMCP Endpoints
 These endpoints are exposed by the AMCP protocol in CasparCG Server. This means that they have some AMCP syntax wrappings, which will likely need to be stripped off if using in an external client
 
@@ -20,6 +30,9 @@ These endpoints are exposed by the AMCP protocol in CasparCG Server. This means 
 * `/thumbnail` - Lists the available thumbnails
 * `/thumbnail/<name>` - Gets the thumbnail for a media file
 * `/templates` - Detailed list of templates in JSON format.
+* `/media` - Lists available media files in json form with an enhanced set of metadata
+* `/media/info/<name>` - Gets the json enhanced metadata for the specified media file
+* `/media/thumbnail/<name>` - Gets the thumbnail for a media file
 
 ### Changes
 A stream of changes can be accessed with the following. [Full docs](https://pouchdb.com/api.html#changes)
@@ -39,11 +52,10 @@ db.changes({
 });
 ```
 
-
 Development
 -----------
 
-This project uses the latest LTS version NodeJS (8), so you need that installed. Get it from: https://nodejs.org/en/. 
+This project uses the latest LTS version NodeJS (18), so you need that installed. Get it from: https://nodejs.org/en/. 
 We also use Leveldown which uses native modules so if you're on Windows you need to install windows build tools:
 
 `npm install --global --production windows-build-tools`

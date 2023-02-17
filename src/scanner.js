@@ -52,7 +52,7 @@ module.exports = function ({ config, db, logger }) {
     logger.info('Checking for dead media')
 
     const limit = 256
-    let startkey = undefined
+    let startkey
     while (true) {
       const deleted = []
 
@@ -85,12 +85,13 @@ module.exports = function ({ config, db, logger }) {
           logger.error({ err, doc })
         }
       }))
+
+      await db.bulkDocs(deleted)
+
       if (rows.length < limit) {
         break
       }
-      startkey = rows[rows.length-1].doc._id
-
-      await db.bulkDocs(deleted)
+      startkey = rows[rows.length - 1].doc._id
     }
 
     logger.info(`Finished check for dead media`)
@@ -162,7 +163,7 @@ module.exports = function ({ config, db, logger }) {
 
     const thumbStat = await statAsync(tmpPath)
     doc.thumbSize = thumbStat.size
-    doc.thumbTime = thumbStat.mtime.toISOString()
+    doc.thumbTime = thumbStat.mtime.getTime()
     doc.tinf = [
       `"${getId(config.paths.media, doc.mediaPath)}"`,
       moment(doc.thumbTime).format('YYYYMMDDTHHmmss'),
@@ -173,14 +174,14 @@ module.exports = function ({ config, db, logger }) {
     doc._attachments = {
       'thumb.png': {
         content_type: 'image/png',
-        data: (await readFileAsync(tmpPath)).toString('base64')
+        data: (await readFileAsync(tmpPath))
       }
     }
     await unlinkAsync(tmpPath)
   }
 
   async function generateInfo (doc) {
-    doc.cinf = await new Promise((resolve, reject) => {
+    const json = await new Promise((resolve, reject) => {
       const args = [
         // TODO (perf) Low priority process?
         config.paths.ffprobe,
@@ -200,32 +201,128 @@ module.exports = function ({ config, db, logger }) {
           return reject(new Error('not media'))
         }
 
-        let tb = (json.streams[0].time_base || '1/25').split('/')
-        let dur = parseFloat(json.format.duration) || (1 / 24)
-
-        let type = ' AUDIO '
-        if (json.streams[0].pix_fmt) {
-          if (dur <= (1 / 24)) {
-            type = ' STILL '
-            tb = [0,1]
-          } else {
-            type = ' MOVIE '
-            const fr = String(json.streams[0].avg_frame_rate || json.streams[0].r_frame_rate || '').split('/')
-            if (fr.length === 2) {
-              tb = [ fr[1], fr[0] ]
-            }
-          }
-        }
-
-        resolve([
-          `"${getId(config.paths.media, doc.mediaPath)}"`,
-          type,
-          doc.mediaSize,
-          moment(doc.thumbTime).format('YYYYMMDDHHmmss'),
-          tb[0] === 0 ? 0 : Math.floor((dur * tb[1]) / tb[0]),
-          `${tb[0]}/${tb[1]}`
-        ].join(' ') + '\r\n')
+        resolve(json)
       })
     })
+
+    doc.cinf = generateCinf(doc, json)
+
+    if (config.metadata !== null) {
+      doc.mediainfo = await generateMediainfo(doc, json)
+    }
+  }
+
+  function generateCinf (doc, json) {
+    let tb = (json.streams[0].time_base || '1/25').split('/')
+    let dur = parseFloat(json.format.duration) || (1 / 24)
+
+    let type = ' AUDIO '
+    if (json.streams[0].pix_fmt) {
+      if (dur <= (1 / 24)) {
+        type = ' STILL '
+        tb = [0,1]
+      } else {
+        type = ' MOVIE '
+        const fr = String(json.streams[0].avg_frame_rate || json.streams[0].r_frame_rate || '').split('/')
+        if (fr.length === 2) {
+          tb = [ fr[1], fr[0] ]
+        }
+      }
+    }
+
+    return [
+      `"${getId(config.paths.media, doc.mediaPath)}"`,
+      type,
+      doc.mediaSize,
+      moment(doc.thumbTime).format('YYYYMMDDHHmmss'),
+      tb[0] === 0 ? 0 : Math.floor((dur * tb[1]) / tb[0]),
+      `${tb[0]}/${tb[1]}`
+    ].join(' ') + '\r\n'
+  }
+
+  async function generateMediainfo (doc, json) {
+    const fieldOrder = await new Promise((resolve, reject) => {
+      if (!config.metadata.fieldOrder) {
+        return resolve('unknown')
+      }
+
+      const args = [
+        // TODO (perf) Low priority process?
+        config.paths.ffmpeg,
+        '-hide_banner',
+        '-filter:v', 'idet',
+        '-frames:v', config.metadata.fieldOrderScanDuration,
+        '-an',
+        '-f', 'rawvideo', '-y', (process.platform === 'win32' ? 'NUL' : '/dev/null'),
+        '-i', `"${doc.mediaPath}"`
+      ]
+      cp.exec(args.join(' '), (err, stdout, stderr) => {
+        if (err) {
+          return reject(err)
+        }
+
+        const resultRegex = /Multi frame detection: TFF:\s+(\d+)\s+BFF:\s+(\d+)\s+Progressive:\s+(\d+)/
+        const res = resultRegex.exec(stderr)
+        if (res === null) {
+          return resolve('unknown')
+        }
+
+        const tff = parseInt(res[1])
+        const bff = parseInt(res[2])
+        const fieldOrder = tff <= 10 && bff <= 10 ? 'progressive' : (tff > bff ? 'tff' : 'bff')
+
+        resolve(fieldOrder)
+      })
+    })
+
+    return {
+      name: doc._id,
+      field_order: fieldOrder,
+
+      streams: json.streams.map(s => ({
+        codec: {
+          long_name: s.codec_long_name,
+          type: s.codec_type,
+          time_base: s.codec_time_base,
+          tag_string: s.codec_tag_string,
+          is_avc: s.is_avc
+        },
+
+        // Video
+        width: s.width,
+        height: s.height,
+        sample_aspect_ratio: s.sample_aspect_ratio,
+        display_aspect_ratio: s.display_aspect_ratio,
+        pix_fmt: s.pix_fmt,
+        bits_per_raw_sample: s.bits_per_raw_sample,
+
+        // Audio
+        sample_fmt: s.sample_fmt,
+        sample_rate: s.sample_rate,
+        channels: s.channels,
+        channel_layout: s.channel_layout,
+        bits_per_sample: s.bits_per_sample,
+
+        // Common
+        time_base: s.time_base,
+        start_time: s.start_time,
+        duration_ts: s.duration_ts,
+        duration: s.duration,
+
+        bit_rate: s.bit_rate,
+        max_bit_rate: s.max_bit_rate,
+        nb_frames: s.nb_frames
+      })),
+      format: {
+        name: json.format.format_name,
+        long_name: json.format.format_long_name,
+        size: json.format.time,
+
+        start_time: json.format.start_time,
+        duration: json.format.duration,
+        bit_rate: json.format.bit_rate,
+        max_bit_rate: json.format.max_bit_rate
+      }
+    }
   }
 }

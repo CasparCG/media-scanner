@@ -1,5 +1,6 @@
 const express = require('express')
 const pinoHttp = require('pino-http')
+const cors = require('cors')
 const PouchDB = require('pouchdb-node')
 const util = require('util')
 const recursiveReadDir = require('recursive-readdir')
@@ -14,9 +15,38 @@ module.exports = function ({ db, config, logger }) {
   const app = express()
 
   app.use(pinoHttp({ logger }))
+  app.use(cors())
 
   app.use('/db', require('express-pouchdb')(PouchDB, {
     mode: 'minimumForPouchDB'
+  }))
+
+  app.get('/media', wrap(async (req, res) => {
+    const { rows } = await db.allDocs({ include_docs: true })
+
+    const blob = rows
+      .filter(r => r.doc.mediainfo)
+      .map(r => r.doc.mediainfo)
+
+    res.set('content-type', 'application/json')
+    res.send(blob)
+  }))
+
+  app.get('/media/info/:id', wrap(async (req, res) => {
+    const { mediainfo } = await db.get(req.params.id.toUpperCase())
+    res.set('content-type', 'application/json')
+    res.send(mediainfo || {})
+  }))
+
+  app.get('/media/thumbnail/:id', wrap(async (req, res) => {
+    const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true, binary: true })
+
+    if (!_attachments['thumb.png']) {
+      return res.status(404).end()
+    }
+
+    res.set('content-type', 'image/png')
+    res.send(_attachments['thumb.png'].data)
   }))
 
   app.get('/cls', wrap(async (req, res) => {
@@ -26,6 +56,7 @@ module.exports = function ({ db, config, logger }) {
       .map(row => row.doc.cinf || '')
       .reduce((acc, inf) => acc + inf, '')
 
+    res.set('content-type', 'text/plain')
     res.send(`200 CLS OK\r\n${str}\r\n`)
   }))
 
@@ -38,6 +69,7 @@ module.exports = function ({ db, config, logger }) {
       .map(x => `${getId(config.paths.template, x)}\r\n`)
       .reduce((acc, inf) => acc + inf, '')
 
+    res.set('content-type', 'text/plain')
     res.send(`200 TLS OK\r\n${str}\r\n`)
   }))
   app.get('/templates', wrap(async (req, res) => {
@@ -129,21 +161,25 @@ module.exports = function ({ db, config, logger }) {
       .map(x => `${getId(config.paths.font, x)}\r\n`)
       .reduce((acc, inf) => acc + inf, '')
 
+    res.set('content-type', 'text/plain')
     res.send(`200 FLS OK\r\n${str}\r\n`)
   }))
 
   app.get('/cinf/:id', wrap(async (req, res) => {
     const { cinf } = await db.get(req.params.id.toUpperCase())
+    res.set('content-type', 'text/plain')
     res.send(`201 CINF OK\r\n${cinf}`)
   }))
 
   app.get('/thumbnail/generate', wrap(async (req, res) => {
     // TODO (fix) Force scanner to scan and wait?
+    res.set('content-type', 'text/plain')
     res.send(`202 THUMBNAIL GENERATE_ALL OK\r\n`)
   }))
 
   app.get('/thumbnail/generate/:id', wrap(async (req, res) => {
     // TODO (fix) Force scanner to scan and wait?
+    res.set('content-type', 'text/plain')
     res.send(`202 THUMBNAIL GENERATE OK\r\n`)
   }))
 
@@ -154,12 +190,18 @@ module.exports = function ({ db, config, logger }) {
       .map(row => row.doc.tinf || '')
       .reduce((acc, inf) => acc + inf, '')
 
+    res.set('content-type', 'text/plain')
     res.send(`200 THUMBNAIL LIST OK\r\n${str}\r\n`)
   }))
 
   app.get('/thumbnail/:id', wrap(async (req, res) => {
     const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true })
 
+    if (!_attachments['thumb.png']) {
+      return res.status(404).end()
+    }
+
+    res.set('content-type', 'text/plain')
     res.send(`201 THUMBNAIL RETRIEVE OK\r\n${_attachments['thumb.png'].data}\r\n`)
   }))
 
