@@ -35,7 +35,8 @@ const defaults = {
   },
   http: {
     port: 8000
-  }
+  },
+  disableFileServing: false
 }
 
 const config = nconf

@@ -211,15 +211,17 @@ module.exports = function ({ db, config, logger }) {
     res.send(`201 THUMBNAIL RETRIEVE OK\r\n${_attachments['thumb.png'].data}\r\n`)
   }))
 
-  app.get('/file/:id', wrap(async (req, res) => {
-    const doc = await db.get(req.params.id.toUpperCase(), { attachments: false })
+  if (!config.disableFileServing) {
+    app.get('/file/:id', wrap(async (req, res) => {
+      const doc = await db.get(req.params.id.toUpperCase(), { attachments: false })
 
-    if (!doc || !doc.mediaPath) {
-      return res.sendStatus(404)
-    }
+      if (!doc || !doc.mediaPath) {
+        return res.sendStatus(404)
+      }
 
-    res.sendFile(path.join(process.cwd(), doc.mediaPath))
-  }))
+      res.sendFile(path.join(process.cwd(), doc.mediaPath))
+    }))
+  }
 
   app.use((err, req, res, next) => {
     if (err) req.log.error({ err })
