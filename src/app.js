@@ -5,6 +5,8 @@ const PouchDB = require('pouchdb-node')
 const util = require('util')
 const recursiveReadDir = require('recursive-readdir')
 const { getId, getGDDScriptElement, extractGDDJSON } = require('./util')
+const path = require('path')
+const process = require('process')
 
 const recursiveReadDirAsync = util.promisify(recursiveReadDir)
 
@@ -207,6 +209,16 @@ module.exports = function ({ db, config, logger }) {
 
     res.set('content-type', 'text/plain')
     res.send(`201 THUMBNAIL RETRIEVE OK\r\n${_attachments['thumb.png'].data}\r\n`)
+  }))
+
+  app.get('/file/:id', wrap(async (req, res) => {
+    const doc = await db.get(req.params.id.toUpperCase(), { attachments: false })
+
+    if (!doc || !doc.mediaPath) {
+      return res.sendStatus(404)
+    }
+
+    res.sendFile(path.join(process.cwd(), doc.mediaPath))
   }))
 
   app.use((err, req, res, next) => {
