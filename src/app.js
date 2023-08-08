@@ -212,8 +212,8 @@ module.exports = function ({ db, config, logger }) {
   }))
 
   if (!config.disableFileServing) {
-    app.get('/file/:id', wrap(async (req, res) => {
-      const doc = await db.get(req.params.id.toUpperCase(), { attachments: false })
+    app.get('/file/*', wrap(async (req, res) => {
+      const doc = await db.get(req.params[0].toUpperCase(), { attachments: false })
 
       if (!doc || !doc.mediaPath) {
         return res.sendStatus(404)
