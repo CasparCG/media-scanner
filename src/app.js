@@ -219,7 +219,11 @@ module.exports = function ({ db, config, logger }) {
         return res.sendStatus(404)
       }
 
-      res.sendFile(path.join(process.cwd(), doc.mediaPath))
+      if (path.isAbsolute(doc.mediaPath)) {
+        res.sendFile(doc.mediaPath)
+      } else {
+        res.sendFile(path.join(process.cwd(), doc.mediaPath))
+      }
     }))
   }
 
