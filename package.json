@@ -12,6 +12,9 @@
     "build-linux-x64": "node tools/build.mjs linux x64",
     "build-win32-x64": "node tools/build.mjs win32 x64"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "author": "",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
@@ -22,18 +25,18 @@
     "mkdirp": "^1.0.1",
     "moment": "^2.29.1",
     "nconf": "^0.12.0",
-    "pino": "^8.5.0",
-    "pino-http": "^3.1.0",
+    "pino": "^8.15.0",
+    "pino-http": "^8.5.0",
     "pouchdb-node": "^7.3.0",
     "recursive-readdir": "^2.2.2",
-    "rxjs": "^7.5.6",
-    "xml2js": "^0.4.23"
+    "rxjs": "^7.8.1",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.19",
-    "pkg": "5.8.0",
-    "rimraf": "^4.1.2",
-    "standard": "^17.0.0",
+    "nodemon": "^2.0.22",
+    "pkg": "5.8.1",
+    "rimraf": "^5.0.1",
+    "standard": "^17.1.0",
     "zip-a-folder": "^1.1.5"
   }
 }
