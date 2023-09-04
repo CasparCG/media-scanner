@@ -8,6 +8,11 @@ Usage
 
 This project is designed to be used via the AMCP protocol in CasparCG server. However, there are some endpoints for additional data which can only be access directly over http.
 
+### Requirements
+
+The scanner needs a copy of `ffmpeg` to be able to scan any media files. On windows, a copy of `ffmpeg.exe` should be placed in the same folder as the scanner executable. On linux, `ffmpeg` should be made available on the path.  
+You can override these locations in the scanner configuration.
+
 ### Configuration
 There are various options that can be changed for the scanner. These can all be set by environment variables or as arguments.
 Some features are disabled by default and should be enabled in this way.
