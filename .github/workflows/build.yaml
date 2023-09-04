@@ -1,4 +1,4 @@
-name: Build Windows
+name: Build
 
 on:
   workflow_dispatch:

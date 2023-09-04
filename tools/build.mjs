@@ -1,5 +1,5 @@
 import * as fs from "fs/promises";
-import rimraf from "rimraf";
+import { rimraf } from "rimraf";
 import cp from "child_process";
 import zipAFolder from "zip-a-folder";
 
