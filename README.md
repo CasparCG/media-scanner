@@ -76,8 +76,6 @@ Be aware that because of the native extensions, you can only build for the targe
   
 The built files will be placed in `./dist`, make sure you copy all files into the main CasparCG directory.
 
-Note: Due to an incompatability with a dependency and pkg, a fix up step is performed during build until this is resolved upstream [pkg](https://github.com/zeit/pkg/issues/75) [express-pouchdb](https://github.com/pouchdb/pouchdb-server/issues/326). This could cause issues when updating the express-pouchdb package.
-
 License
 -------
 

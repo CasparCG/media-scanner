@@ -17,10 +17,6 @@ module.exports = function ({ db, config, logger }) {
   app.use(pinoHttp({ logger }))
   app.use(cors())
 
-  app.use('/db', require('express-pouchdb')(PouchDB, {
-    mode: 'minimumForPouchDB'
-  }))
-
   app.get('/media', wrap(async (req, res) => {
     const { rows } = await db.allDocs({ include_docs: true })
 

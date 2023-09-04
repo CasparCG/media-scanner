@@ -21,7 +21,6 @@
     "chokidar": "^3.5.3",
     "cors": "^2.8.4",
     "express": "^4.18.1",
-    "express-pouchdb": "^4.2.0",
     "mkdirp": "^1.0.1",
     "moment": "^2.29.1",
     "nconf": "^0.12.0",
