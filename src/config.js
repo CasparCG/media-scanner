@@ -34,7 +34,8 @@ const defaults = {
     print: process.env.NODE_ENV !== 'production'
   },
   http: {
-    port: 8000
+    port: 8000,
+    host: undefined
   }
 }
 
