@@ -38,6 +38,7 @@ const defaults = {
 		port: 8000,
 		host: undefined,
 	},
+	disableFileServing: false,
 }
 
 export const config = nconf.argv().env('__').defaults(defaults).get()

@@ -6,6 +6,7 @@ import util from 'util'
 import recursiveReadDir from 'recursive-readdir'
 import { getId, getGDDScriptElement, extractGDDJSON } from './util'
 import { Logger } from 'pino'
+import path from 'path'
 
 const recursiveReadDirAsync = util.promisify(recursiveReadDir)
 
@@ -234,6 +235,34 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 
 			res.set('content-type', 'text/plain')
 			return res.send(`201 THUMBNAIL RETRIEVE OK\r\n${_attachments['thumb.png'].data}\r\n`)
+		})
+	)
+
+	if (!config.disableFileServing) {
+		app.get(
+			'/file/*',
+			wrap(async (req, res) => {
+				const doc = await db.get(req.params[0].toUpperCase(), { attachments: false })
+
+				if (!doc || !doc.mediaPath) {
+					return res.sendStatus(404)
+				}
+
+				if (path.isAbsolute(doc.mediaPath)) {
+					return res.sendFile(doc.mediaPath)
+				} else {
+					return res.sendFile(path.join(process.cwd(), doc.mediaPath))
+				}
+			})
+		)
+	}
+
+	app.get(
+		'/files',
+		wrap(async (_req, res) => {
+			const { rows } = await db.allDocs({ include_docs: true })
+			res.set('content-type', 'application/json')
+			res.send(rows)
 		})
 	)
 
