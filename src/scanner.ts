@@ -68,7 +68,7 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 				include_docs: true,
 				startkey,
 				limit,
-			})
+			}) as any
 			await Promise.all(
 				rows.map(async ({ doc }: { doc: any }) => {
 					try {
