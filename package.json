@@ -1,41 +1,69 @@
 {
-  "name": "scanner",
-  "version": "1.2.0",
-  "description": "",
-  "license": "LGPL-3.0",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon ./src",
-    "lint": "standard",
-    "build": "node tools/build.mjs",
-    "build-linux-arm64": "node tools/build.mjs linux arm64",
-    "build-linux-x64": "node tools/build.mjs linux x64",
-    "build-win32-x64": "node tools/build.mjs win32 x64"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "author": "",
-  "dependencies": {
-    "cheerio": "^1.0.0-rc.12",
-    "chokidar": "^3.5.3",
-    "cors": "^2.8.4",
-    "express": "^4.18.1",
-    "mkdirp": "^1.0.1",
-    "moment": "^2.29.1",
-    "nconf": "^0.12.0",
-    "pino": "^8.15.0",
-    "pino-http": "^8.5.0",
-    "pouchdb-node": "^7.3.0",
-    "recursive-readdir": "^2.2.2",
-    "rxjs": "^7.8.1",
-    "xml2js": "^0.6.2"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.22",
-    "pkg": "5.8.1",
-    "rimraf": "^5.0.1",
-    "standard": "^17.1.0",
-    "zip-a-folder": "^1.1.5"
-  }
+	"name": "scanner",
+	"version": "1.2.0",
+	"description": "",
+	"license": "LGPL-3.0",
+	"main": "dist/index.js",
+	"scripts": {
+		"dev": "nodemon ./src",
+		"build": "rimraf dist && tsc -b && node tools/build.mjs",
+		"build-linux-arm64": "node tools/build.mjs linux arm64",
+		"build-linux-x64": "node tools/build.mjs linux x64",
+		"build-win32-x64": "node tools/build.mjs win32 x64",
+		"prepare": "husky install",
+		"lint:raw": "eslint --ext .ts --ext .js --ext .tsx --ext .jsx --ext .mts --ext .mjs --ignore-pattern dist",
+		"lint": "yarn lint:raw .",
+		"lint-fix": "yarn lint --fix",
+		"license-validate": "yarn sofie-licensecheck"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"author": "",
+	"dependencies": {
+		"cheerio": "^1.0.0-rc.12",
+		"chokidar": "^3.5.3",
+		"cors": "^2.8.4",
+		"express": "^4.18.1",
+		"mkdirp": "^1.0.1",
+		"moment": "^2.29.1",
+		"nconf": "^0.12.0",
+		"pino": "^8.15.0",
+		"pino-http": "^8.5.0",
+		"pouchdb-node": "^7.3.0",
+		"recursive-readdir": "^2.2.2",
+		"rxjs": "^7.8.1",
+		"xml2js": "^0.6.2"
+	},
+	"devDependencies": {
+		"@sofie-automation/code-standard-preset": "^2.5.1",
+		"@types/cors": "^2.8.14",
+		"@types/express": "^4.17.17",
+		"@types/mkdirp": "^1.0.0",
+		"@types/nconf": "^0.10.3",
+		"@types/node": "^18",
+		"@types/pino": "^7.0.5",
+		"@types/recursive-readdir": "^2.2.1",
+		"@types/xml2js": "^0.4.12",
+		"eslint": "^8.48.0",
+		"husky": "^8.0.3",
+		"lint-staged": "^14.0.1",
+		"nodemon": "^2.0.22",
+		"pkg": "5.8.1",
+		"rimraf": "^5.0.1",
+		"ts-node": "^10.9.1",
+		"tslib": "^2.6.2",
+		"typescript": "^5.2.2",
+		"zip-a-folder": "^1.1.5"
+	},
+	"packageManager": "yarn@3.6.3",
+	"prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
+	"lint-staged": {
+		"*.{css,json,md,scss}": [
+			"prettier --write"
+		],
+		"*.{ts,tsx,js,jsx,mts,mjs}": [
+			"yarn lint:raw --fix"
+		]
+	}
 }

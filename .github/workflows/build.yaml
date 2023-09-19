@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: dist
+          path: deploy
 
   release:
     name: Create Release
@@ -58,11 +58,11 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          path: dist
+          path: deploy
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*/*.zip
+          files: deploy/*/*.zip
           prerelease: contains(github.ref, '-')
           fail_on_unmatched_files: true

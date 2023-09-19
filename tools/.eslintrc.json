@@ -1,0 +1,9 @@
+{
+	"rules": {
+		"node/no-unpublished-import": 0
+	},
+	"parserOptions": {
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	}
+}
