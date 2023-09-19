@@ -6,7 +6,7 @@ FROM node:18
 
   COPY package.json package-lock.json ./
   RUN sed -i -e 's/^  "version": "[0-9.]\+",$//' package.json
-  RUN npm install && \
+  RUN yarn install && \
       apt-get update && \
       apt-get install ffmpeg -y
 

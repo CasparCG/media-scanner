@@ -4,11 +4,40 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "**"
+      - '**'
     tags:
-      - "v**"
+      - 'v**'
+  pull_request:
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - name: Prepare Environment
+        run: |
+          yarn install
+        env:
+          CI: true
+      - name: Run typecheck
+        run: |
+          yarn build:ts
+        env:
+          CI: true
+      - name: Run linter
+        run: |
+          yarn lint
+        env:
+          CI: true
+
   build:
     name: Build binaries
     runs-on: ${{ matrix.os }}
@@ -35,8 +64,8 @@ jobs:
           CI: true
           PKG_CACHE_PATH: ${{ runner.temp }}
         run: |
-          npm i
-          npm run build
+          yarn install
+          yarn build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

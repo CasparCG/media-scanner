@@ -67,17 +67,17 @@ We also use Leveldown which uses native modules so if you're on Windows you need
 
 After this:
 * Clone the repository
-* Run `npm install`
-* Run `npm dev` to start the development server
+* Run `yarn install`
+* Run `yarn dev` to start the development server
 
 Building
 -----------
 Be aware that because of the native extensions, you can only build for the target you are currently on.
 
 * On Windows
-  * `npm run build-win32`
+  * `yarn build-win32`
 * On Linux
-  * `npm run build-linux`
+  * `yarn build-linux`
   
 The built files will be placed in `./dist`, make sure you copy all files into the main CasparCG directory.
 
