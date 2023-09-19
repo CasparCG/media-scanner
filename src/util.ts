@@ -5,7 +5,6 @@ import cheerio, { Cheerio, Element } from 'cheerio'
 export function getId(fileDir: string, filePath: string): string {
 	return path
 		.relative(fileDir, filePath) /* take file name without path */
-		.replace(/\.[^/.]+$/, '') /* remove last extension */
 		.replace(/\\+/g, '/') /* replace (multiple)backslashes with forward slashes */
 		.toUpperCase()
 }

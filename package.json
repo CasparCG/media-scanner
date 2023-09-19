@@ -44,6 +44,7 @@
 		"@types/nconf": "^0.10.3",
 		"@types/node": "^18",
 		"@types/pino": "^7.0.5",
+		"@types/pino-http": "^5.8.1",
 		"@types/recursive-readdir": "^2.2.1",
 		"@types/xml2js": "^0.4.12",
 		"eslint": "^8.48.0",

@@ -64,11 +64,12 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 		while (true) {
 			const deleted: Array<any> = []
 
-			const { rows } = await db.allDocs({
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+			const { rows } = (await db.allDocs({
 				include_docs: true,
 				startkey,
 				limit,
-			}) as any
+			})) as any
 			await Promise.all(
 				rows.map(async ({ doc }: { doc: any }) => {
 					try {
