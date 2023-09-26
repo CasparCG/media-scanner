@@ -64,11 +64,11 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 		while (true) {
 			const deleted: Array<any> = []
 
-			const { rows } = await db.allDocs({
+			const { rows } = (await db.allDocs({
 				include_docs: true,
 				startkey,
 				limit,
-			}) as any
+			})) as any
 			await Promise.all(
 				rows.map(async ({ doc }: { doc: any }) => {
 					try {
@@ -224,25 +224,45 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 		}
 	}
 
+	type Timebase = [number, number]
+
 	function generateCinf(doc: Record<string, any>, json: any) {
-		let tb = (json.streams[0].time_base || '1/25').split('/')
 		const dur = parseFloat(json.format.duration) || 1 / 24
 
-		let type = ' AUDIO '
+		let audioTb: Timebase | null = null
+		let videoTb: Timebase | null = null
+		let stillTb: Timebase | null = null
+
 		for (const stream of json.streams) {
-			if (stream.pix_fmt && stream.disposition?.default) {
-				if (dur <= 1 / 24) {
-					type = ' STILL '
-					tb = [0, 1]
+			if (stream.codec_type === 'audio') {
+				if (!audioTb) audioTb = (stream.time_base || '1/25').split('/')
+			} else if (stream.codec_type === 'video') {
+				if (stream.codec_time_base === '0/1') {
+					if (!stillTb) stillTb = [0, 1]
 				} else {
-					type = ' MOVIE '
-					const fr = String(stream.avg_frame_rate || stream.r_frame_rate || '').split('/')
-					if (fr.length === 2) {
-						tb = [fr[1], fr[0]]
+					if (!videoTb) {
+						const fr = String(stream.avg_frame_rate || stream.r_frame_rate || '').split('/')
+						if (fr.length === 2) {
+							videoTb = [Number(fr[1]), Number(fr[0])]
+						} else {
+							videoTb = (stream.time_base || '1/25').split('/')
+						}
 					}
 				}
-				break
 			}
+		}
+
+		let type: string
+		let tb: Timebase
+		if (videoTb) {
+			type = ' MOVIE '
+			tb = videoTb
+		} else if (stillTb && !audioTb) {
+			type = ' STILL '
+			tb = stillTb
+		} else {
+			type = ' AUDIO '
+			tb = audioTb ?? [0, 1]
 		}
 
 		return (
