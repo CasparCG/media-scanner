@@ -1,7 +1,7 @@
 {
 	"name": "scanner",
-	"version": "1.2.0",
-  "private": true,
+	"version": "1.3.0",
+	"private": true,
 	"description": "",
 	"license": "LGPL-3.0",
 	"main": "dist/index.js",
