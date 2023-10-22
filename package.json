@@ -1,9 +1,15 @@
 {
 	"name": "scanner",
 	"version": "1.2.0",
+  "private": true,
 	"description": "",
 	"license": "LGPL-3.0",
 	"main": "dist/index.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CasparCG/media-scanner.git"
+	},
+	"homepage": "https://github.com/CasparCG/media-scanner",
 	"scripts": {
 		"dev": "nodemon ./src",
 		"build": "run build:ts && node tools/build.mjs",
