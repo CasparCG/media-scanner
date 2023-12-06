@@ -24,6 +24,7 @@ jobs:
           node-version: 18.x
       - name: Prepare Environment
         run: |
+          corepack enable
           yarn install
         env:
           CI: true
@@ -64,6 +65,7 @@ jobs:
           CI: true
           PKG_CACHE_PATH: ${{ runner.temp }}
         run: |
+          corepack enable
           yarn install
           yarn build
 

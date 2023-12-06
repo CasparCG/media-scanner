@@ -24,7 +24,7 @@
 		"license-validate": "yarn sofie-licensecheck"
 	},
 	"engines": {
-		"node": ">=18"
+		"node": ">=18.18"
 	},
 	"author": "",
 	"dependencies": {
@@ -64,7 +64,7 @@
 		"typescript": "^5.2.2",
 		"zip-a-folder": "^1.1.5"
 	},
-	"packageManager": "yarn@3.6.3",
+	"packageManager": "yarn@4.0.2",
 	"prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
 	"lint-staged": {
 		"*.{css,json,md,scss}": [
