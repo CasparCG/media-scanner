@@ -38,7 +38,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	)
 
 	app.get(
-		'/media/info/:id',
+		'/media/info/:id(*)',
 		wrap(async (req, res) => {
 			const { mediainfo } = await db.get(req.params.id.toUpperCase())
 			res.set('content-type', 'application/json')
@@ -47,7 +47,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	)
 
 	app.get(
-		'/media/thumbnail/:id',
+		'/media/thumbnail/:id(*)',
 		wrap(async (req, res) => {
 			const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true, binary: true })
 
@@ -185,7 +185,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	)
 
 	app.get(
-		'/cinf/:id',
+		'/cinf/:id(*)',
 		wrap(async (req, res) => {
 			const { cinf } = await db.get(req.params.id.toUpperCase())
 			res.set('content-type', 'text/plain')
@@ -203,7 +203,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	)
 
 	app.get(
-		'/thumbnail/generate/:id',
+		'/thumbnail/generate/:id(*)',
 		wrap(async (_req, res) => {
 			// TODO (fix) Force scanner to scan and wait?
 			res.set('content-type', 'text/plain')
@@ -224,7 +224,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	)
 
 	app.get(
-		'/thumbnail/:id',
+		'/thumbnail/:id(*)',
 		wrap(async (req, res) => {
 			const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true })
 
