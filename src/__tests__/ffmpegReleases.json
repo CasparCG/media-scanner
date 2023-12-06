@@ -1,0 +1,46 @@
+{
+	"linux-x64": [
+		{
+			"id": "4.1.4",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.1.4-amd64-static.tar.xz"
+		},
+		{
+			"id": "4.2.2",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.2.2-amd64-static.tar.xz"
+		},
+		{
+			"id": "4.4.1",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.4.1-amd64-static.tar.xz"
+		},
+		{
+			"id": "5.1.1",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.1-amd64-static.tar.xz"
+		},
+		{
+			"id": "6.1",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.1-amd64-static.tar.xz"
+		}
+	],
+	"win32-x64": [
+		{
+			"id": "4.1.4",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.1.4-win64-static.zip"
+		},
+		{
+			"id": "4.2.2",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.2.2-win64-static.zip"
+		},
+		{
+			"id": "4.3.1",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.3.1-win64-static.zip"
+		},
+		{
+			"id": "5.1.2",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.2-essentials_build.zip"
+		},
+		{
+			"id": "6.1",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.1-essentials_build.zip"
+		}
+	]
+}

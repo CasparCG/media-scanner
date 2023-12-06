@@ -13,3 +13,5 @@ casparcg.config
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.ffmpeg/
+/coverage

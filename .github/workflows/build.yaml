@@ -39,6 +39,30 @@ jobs:
         env:
           CI: true
 
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - name: Prepare Environment
+        run: |
+          corepack enable
+          yarn install
+        env:
+          CI: true
+      - name: Run tests
+        run: |
+          yarn unit
+        env:
+          CI: true
+
   build:
     name: Build binaries
     runs-on: ${{ matrix.os }}

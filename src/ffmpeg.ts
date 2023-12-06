@@ -12,7 +12,7 @@ const statAsync = util.promisify(fs.stat)
 const unlinkAsync = util.promisify(fs.unlink)
 const readFileAsync = util.promisify(fs.readFile)
 
-export async function generateThumb(config: Record<string, any>, doc: PouchDBMediaDocument) {
+export async function generateThumb(config: Record<string, any>, doc: PouchDBMediaDocument): Promise<void> {
 	const tmpPath = path.join(os.tmpdir(), Math.random().toString(16)) + '.png'
 
 	const args = [
@@ -53,7 +53,7 @@ export async function generateThumb(config: Record<string, any>, doc: PouchDBMed
 	await unlinkAsync(tmpPath)
 }
 
-export async function generateInfo(config: Record<string, any>, doc: PouchDBMediaDocument) {
+export async function generateInfo(config: Record<string, any>, doc: PouchDBMediaDocument): Promise<void> {
 	const json = await new Promise((resolve, reject) => {
 		const args = [
 			// TODO (perf) Low priority process?
@@ -133,7 +133,7 @@ function generateCinf(config: Record<string, any>, doc: MediaDocument, json: any
 			`"${getId(config.paths.media, doc.mediaPath)}"`,
 			type,
 			doc.mediaSize,
-			moment(doc.thumbTime).format('YYYYMMDDHHmmss'),
+			moment(doc.mediaTime).format('YYYYMMDDHHmmss'),
 			tb[0] === 0 ? 0 : Math.floor((dur * tb[1]) / tb[0]),
 			`${tb[0]}/${tb[1]}`,
 		].join(' ') + '\r\n'
