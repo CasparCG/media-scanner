@@ -27,7 +27,7 @@ function runForFFmpegRelease(ffprobePath: string, ffmpegPath: string) {
 		},
 	}
 
-	it('png', async () => {
+	test('png', async () => {
 		const doc = createBareDoc('grey.png')
 		await generateInfo(defaultConfig, doc)
 		expect(doc.cinf).toBe('"GREY"  STILL  45678 20231206123456 0 0/1\r\n')

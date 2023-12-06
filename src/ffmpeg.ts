@@ -91,16 +91,25 @@ type Timebase = [number, number]
 
 function generateCinf(config: Record<string, any>, doc: MediaDocument, json: any) {
 	const dur = parseFloat(json.format.duration) || 1 / 24
+	const stillLimit = 0.1
 
 	let audioTb: Timebase | null = null
 	let videoTb: Timebase | null = null
 	let stillTb: Timebase | null = null
+	let audioDur = 0
 
 	for (const stream of json.streams) {
 		if (stream.codec_type === 'audio') {
-			if (!audioTb) audioTb = (stream.time_base || '1/25').split('/')
+			if (!audioTb) {
+				audioTb = (stream.time_base || '1/25').split('/')
+				audioDur = parseFloat(stream.duration)
+			}
 		} else if (stream.codec_type === 'video') {
-			if (stream.codec_time_base === '0/1') {
+			if (
+				Number(stream.duration ?? '0') < stillLimit ||
+				stream.disposition.attached_pic === 1 ||
+				stream.codec_name === 'gif'
+			) {
 				if (!stillTb) stillTb = [0, 1]
 			} else {
 				if (!videoTb) {
@@ -120,7 +129,7 @@ function generateCinf(config: Record<string, any>, doc: MediaDocument, json: any
 	if (videoTb) {
 		type = ' MOVIE '
 		tb = videoTb
-	} else if (stillTb && !audioTb) {
+	} else if ((stillTb && !audioTb) || (stillTb && audioTb && audioDur < stillLimit)) {
 		type = ' STILL '
 		tb = stillTb
 	} else {
