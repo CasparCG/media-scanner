@@ -2,7 +2,7 @@ import * as fs from 'fs/promises'
 import { rimraf } from 'rimraf'
 import cp from 'child_process'
 import zipAFolder from 'zip-a-folder'
-import mkdirp from 'mkdirp'
+import { mkdirp } from 'mkdirp'
 
 const platform = process.argv[2] || process.platform
 const arch = process.argv[3] || process.arch
