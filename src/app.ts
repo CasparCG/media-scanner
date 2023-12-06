@@ -2,17 +2,16 @@
 import express from 'express'
 import pinoHttp from 'pino-http'
 import cors from 'cors'
-import util from 'util'
 import recursiveReadDir from 'recursive-readdir'
 import { getId, getGDDScriptElement, extractGDDJSON } from './util'
 import { Logger } from 'pino'
+import { MediaDatabase } from './db'
 
-const recursiveReadDirAsync = util.promisify(recursiveReadDir)
-
-const wrap = (fn: express.Handler) => async (req: express.Request, res: express.Response, next: express.NextFunction) =>
+const wrap = (fn: express.Handler) => (req: express.Request, res: express.Response, next: express.NextFunction) => {
 	Promise.resolve(fn(req, res, next)).catch(next)
+}
 
-export default function ({ db, config, logger }: { db: any; config: any; logger: Logger }): express.Application {
+export default function (logger: Logger, db: MediaDatabase, config: Record<string, any>): express.Application {
 	const app = express()
 
 	app.use(pinoHttp({ logger }))
@@ -23,14 +22,16 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 		wrap(async (_req, res) => {
 			const { rows } = await db.allDocs({ include_docs: true })
 
-			const blob = rows
-				.filter((r: any) => r.doc.mediainfo)
-				.map((r: any) => ({
-					...r.doc.mediainfo,
-					mediaSize: r.doc.mediaSize,
-					mediaTime: r.doc.mediaTime,
-				}))
-
+			const blob: any[] = []
+			for (const row of rows) {
+				if (row.doc?.mediainfo) {
+					blob.push({
+						...row.doc.mediainfo,
+						mediaSize: row.doc.mediaSize,
+						mediaTime: row.doc.mediaTime,
+					})
+				}
+			}
 			res.set('content-type', 'application/json')
 			res.send(blob)
 		})
@@ -50,12 +51,13 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 		wrap(async (req, res) => {
 			const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true, binary: true })
 
-			if (!_attachments['thumb.png']) {
+			const thumbAttachment = _attachments?.['thumb.png']
+			if (!thumbAttachment || !('data' in thumbAttachment)) {
 				return res.status(404).end()
 			}
 
 			res.set('content-type', 'image/png')
-			return res.send(_attachments['thumb.png'].data)
+			return res.send(thumbAttachment.data)
 		})
 	)
 
@@ -64,7 +66,7 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 		wrap(async (_req, res) => {
 			const { rows } = await db.allDocs({ include_docs: true })
 
-			const str = rows.map((row: any) => row.doc.cinf || '').reduce((acc: string, inf: string) => acc + inf, '')
+			const str = rows.map((row) => row.doc?.cinf || '').join('')
 
 			res.set('content-type', 'text/plain')
 			res.send(`200 CLS OK\r\n${str}\r\n`)
@@ -75,12 +77,12 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 		'/tls',
 		wrap(async (_req, res) => {
 			// TODO (perf) Use scanner?
-			const rows = (await recursiveReadDirAsync(config.paths.template)) as string[]
+			const rows: string[] = await recursiveReadDir(config.paths.template)
 
 			const str = rows
 				.filter((x: string) => /\.(ft|wt|ct|html)$/.test(x))
 				.map((x: string) => `${getId(config.paths.template, x)}\r\n`)
-				.reduce((acc: string, inf: string) => acc + inf, '')
+				.join('')
 
 			res.set('content-type', 'text/plain')
 			res.send(`200 TLS OK\r\n${str}\r\n`)
@@ -92,7 +94,7 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 			// TODO (perf) Use scanner?
 
 			// List all files in the templates dir
-			const files = (await recursiveReadDirAsync(config.paths.template)) as string[]
+			const files: string[] = await recursiveReadDir(config.paths.template)
 
 			// Categorize HTML templates separately,
 			// because they have features that other template types do not.
@@ -173,11 +175,9 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 		'/fls',
 		wrap(async (_req, res) => {
 			// TODO (perf) Use scanner?
-			const rows = (await recursiveReadDirAsync(config.paths.font)) as string[]
+			const rows: string[] = await recursiveReadDir(config.paths.font)
 
-			const str = rows
-				.map((x: any) => `${getId(config.paths.font, x)}\r\n`)
-				.reduce((acc: string, inf: string) => acc + inf, '')
+			const str = rows.map((x) => `${getId(config.paths.font, x)}\r\n`).join('')
 
 			res.set('content-type', 'text/plain')
 			res.send(`200 FLS OK\r\n${str}\r\n`)
@@ -216,7 +216,7 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 		wrap(async (_req, res) => {
 			const { rows } = await db.allDocs({ include_docs: true })
 
-			const str = rows.map((row: any) => row.doc.tinf || '').reduce((acc: string, inf: string) => acc + inf, '')
+			const str = rows.map((row) => row.doc?.tinf || '').join('')
 
 			res.set('content-type', 'text/plain')
 			res.send(`200 THUMBNAIL LIST OK\r\n${str}\r\n`)
@@ -228,12 +228,13 @@ export default function ({ db, config, logger }: { db: any; config: any; logger:
 		wrap(async (req, res) => {
 			const { _attachments } = await db.get(req.params.id.toUpperCase(), { attachments: true })
 
-			if (!_attachments['thumb.png']) {
+			const thumbAttachment = _attachments?.['thumb.png']
+			if (!thumbAttachment || !('data' in thumbAttachment)) {
 				return res.status(404).end()
 			}
 
 			res.set('content-type', 'text/plain')
-			return res.send(`201 THUMBNAIL RETRIEVE OK\r\n${_attachments['thumb.png'].data}\r\n`)
+			return res.send(`201 THUMBNAIL RETRIEVE OK\r\n${thumbAttachment.data}\r\n`)
 		})
 	)
 

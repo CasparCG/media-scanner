@@ -10,13 +10,14 @@ import path from 'path'
 import { getId } from './util'
 import moment from 'moment'
 import { Logger } from 'pino'
+import { MediaDatabase, MediaDocument, PouchDBMediaDocument } from './db'
 
 const statAsync = util.promisify(fs.stat)
 const unlinkAsync = util.promisify(fs.unlink)
 const readFileAsync = util.promisify(fs.readFile)
 
-export default function ({ config, db, logger }: { config: Record<string, any>; db: any; logger: Logger }): void {
-	Observable.create((o: any) => {
+export default function (logger: Logger, db: MediaDatabase, config: Record<string, any>): void {
+	new Observable<[path: string, stat: fs.Stats | undefined]>((o) => {
 		const watcher = chokidar
 			.watch(
 				config.scanner.paths,
@@ -34,8 +35,10 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 			.on('error', (err) => logger.error({ err }))
 			.on('add', (path, stat) => o.next([path, stat]))
 			.on('change', (path, stat) => o.next([path, stat]))
-			.on('unlink', (path) => o.next([path]))
-		return async () => watcher.close()
+			.on('unlink', (path) => o.next([path, undefined]))
+		return () => {
+			watcher.close().catch(() => null)
+		}
 	})
 		// TODO (perf) groupBy + mergeMap with concurrency.
 		.pipe(
@@ -74,7 +77,7 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 					try {
 						const mediaFolder = path.normalize(config.scanner.paths)
 						const mediaPath = path.normalize(doc.mediaPath)
-						if (mediaPath.indexOf(mediaFolder) === 0) {
+						if (mediaPath.startsWith(mediaFolder)) {
 							try {
 								const stat = await statAsync(doc.mediaPath)
 								if (stat.isFile()) {
@@ -113,7 +116,9 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 			return
 		}
 
-		const doc = await db.get(mediaId).catch(() => ({ _id: mediaId }))
+		const doc: PouchDBMediaDocument = await db
+			.get(mediaId)
+			.catch(() => ({ _id: mediaId, _rev: '0', mediaPath: '', mediaSize: 0, mediaTime: 0 }))
 
 		const mediaLogger = logger.child({
 			id: mediaId,
@@ -149,7 +154,7 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 		mediaLogger.info('Scanned')
 	}
 
-	async function generateThumb(doc: any) {
+	async function generateThumb(doc: PouchDBMediaDocument) {
 		const tmpPath = path.join(os.tmpdir(), Math.random().toString(16)) + '.png'
 
 		const args = [
@@ -190,7 +195,7 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 		await unlinkAsync(tmpPath)
 	}
 
-	async function generateInfo(doc: Record<string, any>) {
+	async function generateInfo(doc: PouchDBMediaDocument) {
 		const json = await new Promise((resolve, reject) => {
 			const args = [
 				// TODO (perf) Low priority process?
@@ -226,7 +231,7 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 
 	type Timebase = [number, number]
 
-	function generateCinf(doc: Record<string, any>, json: any) {
+	function generateCinf(doc: MediaDocument, json: any) {
 		const dur = parseFloat(json.format.duration) || 1 / 24
 
 		let audioTb: Timebase | null = null
@@ -277,7 +282,7 @@ export default function ({ config, db, logger }: { config: Record<string, any>; 
 		)
 	}
 
-	async function generateMediainfo(doc: Record<string, any>, json: any) {
+	async function generateMediainfo(doc: PouchDBMediaDocument, json: any) {
 		const fieldOrder = await new Promise((resolve, reject) => {
 			if (!config.metadata.fieldOrder) {
 				return resolve('unknown')
