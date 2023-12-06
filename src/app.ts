@@ -238,7 +238,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 		})
 	)
 
-	app.use((err: any, req: express.Request, res: express.Response): void => {
+	app.use((err: any, req: express.Request, res: express.Response, _next: unknown): void => {
 		if (err) req.log.error({ err })
 		if (!res.headersSent) {
 			res.statusCode = err ? err.status || err.statusCode || 500 : 500
