@@ -10,6 +10,7 @@
 			"media-scanner": ["./src/index.ts"]
 		},
 		"types": ["node"],
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"skipLibCheck": true
 	}
 }

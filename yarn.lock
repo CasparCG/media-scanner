@@ -386,6 +386,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/debug@npm:*":
+  version: 4.1.12
+  resolution: "@types/debug@npm:4.1.12"
+  dependencies:
+    "@types/ms": "*"
+  checksum: 47876a852de8240bfdaf7481357af2b88cb660d30c72e73789abf00c499d6bc7cd5e52f41c915d1b9cd8ec9fef5b05688d7b7aef17f7f272c2d04679508d1053
+  languageName: node
+  linkType: hard
+
 "@types/express-serve-static-core@npm:^4.17.33":
   version: 4.17.36
   resolution: "@types/express-serve-static-core@npm:4.17.36"
@@ -454,6 +463,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/ms@npm:*":
+  version: 0.7.34
+  resolution: "@types/ms@npm:0.7.34"
+  checksum: f38d36e7b6edecd9badc9cf50474159e9da5fa6965a75186cceaf883278611b9df6669dc3a3cc122b7938d317b68a9e3d573d316fcb35d1be47ec9e468c6bd8a
+  languageName: node
+  linkType: hard
+
 "@types/nconf@npm:^0.10.3":
   version: 0.10.3
   resolution: "@types/nconf@npm:0.10.3"
@@ -488,6 +504,75 @@ __metadata:
   dependencies:
     pino: "*"
   checksum: f1c59f7d9a7b717e014e93a6e3f235cf824c93696f6530d41316a6188eb6e3846ce44941d2641665c6a4d0dc64a63ea24e277b2acff52e766ad7169e1a20f973
+  languageName: node
+  linkType: hard
+
+"@types/pouchdb-adapter-http@npm:*":
+  version: 6.1.6
+  resolution: "@types/pouchdb-adapter-http@npm:6.1.6"
+  dependencies:
+    "@types/pouchdb-core": "*"
+  checksum: 7afeb830799aad8a72fbd4f45789cef8cf37b18a820feeefb07ac72e2f16c60ecf554439d917e260dabd8e36e9f3decb8c8c4fd78d9cd66aefa796dd39dcd4d5
+  languageName: node
+  linkType: hard
+
+"@types/pouchdb-adapter-leveldb@npm:*":
+  version: 6.1.6
+  resolution: "@types/pouchdb-adapter-leveldb@npm:6.1.6"
+  dependencies:
+    "@types/pouchdb-core": "*"
+  checksum: b99c07389de767223b1a3b018da5dbfb424c15df8ccc04549700855e6976b131da87d90485be83b375572392e678ac35e76381e7766ee9b517d2f38ddb6e76e7
+  languageName: node
+  linkType: hard
+
+"@types/pouchdb-core@npm:*":
+  version: 7.0.14
+  resolution: "@types/pouchdb-core@npm:7.0.14"
+  dependencies:
+    "@types/debug": "*"
+    "@types/pouchdb-find": "*"
+  checksum: 29bd1ba091645e697af0ae2f67a7222f56edd8eca9b8dd83e248ddfdd3de42242aafcdbc2c027388566d005207e20369e88de7da4395e8e20ab2c76f2b6c86e8
+  languageName: node
+  linkType: hard
+
+"@types/pouchdb-find@npm:*":
+  version: 7.3.3
+  resolution: "@types/pouchdb-find@npm:7.3.3"
+  dependencies:
+    "@types/pouchdb-core": "*"
+  checksum: f65d555858aba6cdf1ac86482949f11593935107cca6a2fd2a36270afc0009f1d0401382582f52733d0e6947e0daef0fd720eb28588e329c3dff64bea1888ef1
+  languageName: node
+  linkType: hard
+
+"@types/pouchdb-mapreduce@npm:*":
+  version: 6.1.10
+  resolution: "@types/pouchdb-mapreduce@npm:6.1.10"
+  dependencies:
+    "@types/pouchdb-core": "*"
+  checksum: 3e50e3263d68ea21451bf6793533a2aeb65cf7b9d2a3d89f5681140ff1bbdf32f06ef75a75a33c37731686faebfb47b35fc5a850a50d59e755a8e68fb647a102
+  languageName: node
+  linkType: hard
+
+"@types/pouchdb-node@npm:^6.1.7":
+  version: 6.1.7
+  resolution: "@types/pouchdb-node@npm:6.1.7"
+  dependencies:
+    "@types/pouchdb-adapter-http": "*"
+    "@types/pouchdb-adapter-leveldb": "*"
+    "@types/pouchdb-core": "*"
+    "@types/pouchdb-mapreduce": "*"
+    "@types/pouchdb-replication": "*"
+  checksum: 04f5192daa56f186fb70591becd3cdb23161e59d4140b218c71796fe50be2b9815314fe3b6dce28a01ab1ff83311e40fc3f58f981b7e52255c0cf2e552db5458
+  languageName: node
+  linkType: hard
+
+"@types/pouchdb-replication@npm:*":
+  version: 6.4.7
+  resolution: "@types/pouchdb-replication@npm:6.4.7"
+  dependencies:
+    "@types/pouchdb-core": "*"
+    "@types/pouchdb-find": "*"
+  checksum: da1b0c87a96e69795b3fa2e6b2effacfac9cebf85a7f0e5d024a4f56935b6e4ed181ef4c3721f1d010ed16d475649810a167889ff1a770966fa55c55d5b113ee
   languageName: node
   linkType: hard
 
@@ -4916,6 +5001,7 @@ __metadata:
     "@types/nconf": ^0.10.3
     "@types/node": ^18
     "@types/pino": ^7.0.5
+    "@types/pouchdb-node": ^6.1.7
     "@types/recursive-readdir": ^2.2.1
     "@types/xml2js": ^0.4.12
     cheerio: ^1.0.0-rc.12
