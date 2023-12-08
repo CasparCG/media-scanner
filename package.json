@@ -13,7 +13,7 @@
 	"scripts": {
 		"dev": "nodemon ./src",
 		"build": "run build:ts && node tools/build.mjs",
-		"build:ts": "rimraf dist && tsc -b",
+		"build:ts": "rimraf dist && tsc -b tsconfig.build.json",
 		"build-linux-arm64": "node tools/build.mjs linux arm64",
 		"build-linux-x64": "node tools/build.mjs linux x64",
 		"build-win32-x64": "node tools/build.mjs win32 x64",
