@@ -144,7 +144,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 			}),
 		])
 
-		await db.put(doc)
+		await db.put(doc, { force: true })
 
 		mediaLogger.info('Scanned')
 	}
