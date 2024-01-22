@@ -43,7 +43,6 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 				// Filter out files that are not to be scanned
 				if (!filter(mediaId, mediaPath)) return
 
-				console.log('mediaId', mediaId)
 				try {
 					if (!mediaStat) {
 						await db.remove(await db.get(mediaId))
