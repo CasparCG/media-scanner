@@ -10,7 +10,7 @@ This project is designed to be used via the AMCP protocol in CasparCG server. Ho
 
 ### Requirements
 
-The scanner needs a copy of `ffmpeg` to be able to scan any media files. On windows, a copy of `ffmpeg.exe` should be placed in the same folder as the scanner executable. On linux, `ffmpeg` should be made available on the path.  
+The scanner needs a copy of `ffmpeg` to be able to scan any media files. On windows, a copy of `ffmpeg.exe` should be placed in the same folder as the scanner executable. On linux, `ffmpeg` should be made available on the path.
 You can override these locations in the scanner configuration.
 
 ### Configuration
@@ -57,32 +57,36 @@ db.changes({
 });
 ```
 
-Development
------------
+# For Developers
 
-This project uses the latest LTS version NodeJS (18), so you need that installed. Get it from: https://nodejs.org/en/. 
+## Running in development
+
+This project uses the latest LTS version NodeJS (18), so you need that installed. Get it from: https://nodejs.org/en/.
 We also use Leveldown which uses native modules so if you're on Windows you need to install windows build tools:
 
 `npm install --global --production windows-build-tools`
 
 After this:
 * Clone the repository
+* [Required] Obtain the [_FFmpeg_ and _FFprobe_](https://ffmpeg.org/download.html) executables and place them in the root folder (or add them to your PATH).
+  * FFmpeg 6.1 is currently recommended, newer versions have not been tested and may have issues
+  * A full list of known working versions can be found at https://github.com/CasparCG/media-scanner/blob/master/src/__tests__/ffmpegReleases.json
+* [Optional] Copy a `casparcg.config` file into the root folder
 * Run `yarn install`
 * Run `yarn dev` to start the development server
 
-Building
------------
+## Building executable
+
 Be aware that because of the native extensions, you can only build for the target you are currently on.
 
 * On Windows
   * `yarn build-win32`
 * On Linux
   * `yarn build-linux`
-  
+
 The built files will be placed in `./dist`, make sure you copy all files into the main CasparCG directory.
 
-License
--------
+# License
 
 CasparCG Media-Scanner is distributed under the GNU Lesser General Public License LGPLv3 or
 higher, see [LICENSE](LICENSE) for details.
@@ -90,8 +94,7 @@ higher, see [LICENSE](LICENSE) for details.
 More information is available at http://casparcg.com/
 
 
-Documentation
--------------
+# Documentation
 
 The most up-to-date documentation is always available at
 https://github.com/CasparCG/help/wiki
