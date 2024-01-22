@@ -69,6 +69,8 @@ We also use Leveldown which uses native modules so if you're on Windows you need
 After this:
 * Clone the repository
 * [Required] Obtain the [_FFmpeg_ and _FFprobe_](https://ffmpeg.org/download.html) executables and place them in the root folder (or add them to your PATH).
+  * FFmpeg 6.1 is currently recommended, newer versions have not been tested and may have issues
+  * A full list of known working versions can be found at https://github.com/CasparCG/media-scanner/blob/master/src/__tests__/ffmpegReleases.json
 * [Optional] Copy a `casparcg.config` file into the root folder
 * Run `yarn install`
 * Run `yarn dev` to start the development server
