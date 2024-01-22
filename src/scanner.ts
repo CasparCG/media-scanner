@@ -41,7 +41,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 				const mediaId = getId(config.paths.media, mediaPath)
 
 				// Filter out files that are not to be scanned
-				if (!filter(mediaId, mediaPath)) return
+				if (!shouldFileBeScanned(mediaId, mediaPath)) return
 
 				try {
 					if (!mediaStat) {
@@ -156,7 +156,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	 * Filter out files that are not to be scanned
 	 * @returns true if the media is to be scanned, false otherwise
 	 */
-	function filter(mediaId: string, _mediaPath: string): boolean {
+	function shouldFileBeScanned(mediaId: string, _mediaPath: string): boolean {
 		if (mediaId.startsWith('_')) {
 			// PouchDB cannot store these ("Only reserved document ids may start with underscore.")
 			return false
