@@ -105,11 +105,10 @@ function generateCinf(config: Record<string, any>, doc: MediaDocument, json: any
 				audioDur = parseFloat(stream.duration)
 			}
 		} else if (stream.codec_type === 'video') {
-			if (
-				Number(stream.duration ?? '0') < stillLimit ||
-				stream.disposition.attached_pic === 1 ||
-				stream.codec_name === 'gif'
-			) {
+			// Sometimes the stream has no duration, so fallback to using the file duration
+			const streamDuration = Number(stream.duration || json.format.duration) || 0
+
+			if (streamDuration < stillLimit || stream.codec_name == 'gif' || stream.disposition.attached_pic === 1) {
 				if (!stillTb) stillTb = [0, 1]
 			} else {
 				if (!videoTb) {
