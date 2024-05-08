@@ -41,6 +41,10 @@
 		{
 			"id": "6.1",
 			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.1-essentials_build.zip"
+		},
+		{
+			"id": "7.0",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0-essentials_build.zip"
 		}
 	]
 }
