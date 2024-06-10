@@ -79,12 +79,9 @@ After this:
 
 Be aware that because of the native extensions, you can only build for the target you are currently on.
 
-* On Windows
-  * `yarn build-win32`
-* On Linux
-  * `yarn build-linux`
+* `yarn build`
 
-The built files will be placed in `./dist`, make sure you copy all files into the main CasparCG directory.
+The built files will be placed in `./deploy`, make sure you copy all non-zipfiles into the main CasparCG directory.
 
 # License
 
