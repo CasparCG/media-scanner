@@ -26,7 +26,8 @@
 		"eslint": "./node_modules/.bin/eslint"
 	},
 	"engines": {
-		"node": ">=18.18"
+		"node": ">=18.18",
+		"yarn": ">=4"
 	},
 	"author": "",
 	"dependencies": {
