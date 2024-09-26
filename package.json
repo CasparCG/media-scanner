@@ -18,6 +18,7 @@
 		"build-linux-arm64": "run build linux arm64",
 		"build-linux-x64": "run build linux x64",
 		"build-win32-x64": "run build win32 x64",
+		"build:docker": "docker build .",
 		"lint:raw": "run eslint --ext .ts --ext .js --ext .tsx --ext .jsx --ext .mts --ext .mjs --ignore-pattern dist",
 		"lint": "yarn lint:raw .",
 		"lint-fix": "yarn lint --fix",

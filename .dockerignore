@@ -1,0 +1,7 @@
+_media
+.ffmpeg
+.coverage
+deploy
+dist
+node_modules
+pouch__all_dbs__
