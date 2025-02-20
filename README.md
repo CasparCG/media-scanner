@@ -18,7 +18,7 @@ Some features are disabled by default and should be enabled in this way.
 
 To change options with arguments use the following syntax: `scanner.exe --metadata.scenes true --metadata.sceneThreshold 0.5`
 
-The full set of available options and their default values can be found at [config.js](src/config.js)
+The full set of available options and their default values can be found at [config.ts](src/config.ts)
 
 By default the scanner expects there to be a casparcg.config file next to the executable to specify the paths to media. To disable use of this file `scanner.exe --caspar null`
 
