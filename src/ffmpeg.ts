@@ -212,6 +212,7 @@ async function generateMediainfo(config: Record<string, any>, doc: PouchDBMediaD
 			display_aspect_ratio: s.display_aspect_ratio,
 			pix_fmt: s.pix_fmt,
 			bits_per_raw_sample: s.bits_per_raw_sample,
+			frame_rate: s.avg_frame_rate || s.r_frame_rate,
 
 			// Audio
 			sample_fmt: s.sample_fmt,
