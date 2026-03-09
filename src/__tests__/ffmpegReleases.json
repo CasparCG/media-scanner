@@ -25,6 +25,20 @@
 			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0.2-amd64-static.tar.xz"
 		}
 	],
+	"linux-arm64": [
+		{
+			"id": "5.1.1",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.1-arm64-static.tar.xz"
+		},
+		{
+			"id": "6.0.1",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.0.1-arm64-static.tar.xz"
+		},
+		{
+			"id": "7.0.2",
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0.2-arm64-static.tar.xz"
+		}
+	],
 	"win32-x64": [
 		{
 			"id": "4.1.4",
