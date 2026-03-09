@@ -104,7 +104,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.os }}
-          path: deploy
+          path: |
+            deploy/*.zip
+            deploy/*.tar.gz
 
   release:
     name: Create Release

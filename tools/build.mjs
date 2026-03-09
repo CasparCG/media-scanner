@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises'
 import { rimraf } from 'rimraf'
 import cp from 'node:child_process'
-import { zip } from 'zip-a-folder'
+import { zip, tar } from 'zip-a-folder'
 import { build } from 'esbuild'
 // import pkg from '@yao-pkg/pkg'
 
@@ -29,7 +29,7 @@ await fs.cp(`./node_modules/leveldown/prebuilds/${platform}-${arch}`, `deploy/pr
 	recursive: true,
 })
 
-// Create zip
+// Determine version and package name for archive naming
 const packageJson = await fs.readFile('./package.json')
 const pkg = JSON.parse(packageJson)
 const version = pkg.version
@@ -65,13 +65,17 @@ if (!unpacked) {
 	}
 
 	await rimraf(['deploy/package.json', 'deploy/scanner.js', 'deploy/prebuilds'])
-} else {
-	const zipFileName = `${packageName}-v${version}-unpacked-${platform}-${arch}.zip`
-
-	const err = await zip('./deploy', `./${zipFileName}`)
-	if (err) {
-		throw new Error(err)
-	}
-
-	await fs.rename(`./${zipFileName}`, `./deploy/${zipFileName}`)
 }
+
+// Archive the deploy folder — tar.gz on Linux, zip everywhere else
+const archiveSuffix = unpacked ? '-unpacked' : ''
+const archiveExt = platform === 'linux' ? '.tar.gz' : '.zip'
+const archiveFileName = `${packageName}-v${version}${archiveSuffix}-${platform}-${arch}${archiveExt}`
+
+if (platform === 'linux') {
+	await tar('./deploy', `./${archiveFileName}`)
+} else {
+	await zip('./deploy', `./${archiveFileName}`)
+}
+
+await fs.rename(`./${archiveFileName}`, `./deploy/${archiveFileName}`)
