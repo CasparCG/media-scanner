@@ -9,6 +9,10 @@ on:
       - 'v**'
   pull_request:
 
+# Default to read-only; individual jobs elevate as needed.
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -110,17 +114,62 @@ jobs:
       - build
 
     permissions:
-      contents: write
+      contents: write # needed to create releases and upload assets
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Download artifact
         uses: actions/download-artifact@v8
         with:
           path: deploy
+          merge-multiple: true # flatten all artifacts into one directory
+
+      - name: Extract changelog for this release
+        id: changelog
+        run: |
+          node --input-type=module << 'EOF'
+          import { readFileSync, writeFileSync } from 'fs'
+
+          const changelog = readFileSync('CHANGELOG.md', 'utf8')
+
+          // Split on version heading lines only (## [x.y.z] or ## x.y.z).
+          // Using a digit lookahead avoids splitting on non-version ## headings
+          // such as "## Breaking changes".
+          const parts = changelog.split(/(?=^## \[?\d)/m)
+
+          // parts[0] is the preamble ("# Changelog\n\n..."), parts[1] is latest version, etc.
+          const latest = parts.find((p) => p.startsWith('## '))
+
+          if (!latest) {
+            console.warn('Could not find any version sections in CHANGELOG.md')
+            writeFileSync('release-notes.md', '')
+            process.exit(0)
+          }
+
+          // Strip the heading line itself — the release title already shows the version.
+          const lines = latest.split('\n')
+          const headingLine = lines[0]
+          const body = lines.slice(1).join('\n').trim()
+
+          // Extract the compare URL from the heading: ## [x.y.z](url) (date)
+          const urlMatch = headingLine.match(/\[.*?\]\((https?:\/\/[^)]+)\)/)
+          const fullChangelog = urlMatch
+            ? `\n\n**Full Changelog**: ${urlMatch[1]}`
+            : ''
+
+          const output = body + fullChangelog
+          writeFileSync('release-notes.md', output)
+          console.log('Extracted release notes:\n' + output)
+          EOF
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: deploy/*/*.zip
-          prerelease: contains(github.ref, '-')
+          files: deploy/*
+          body_path: release-notes.md
+          # Mark as pre-release if the tag contains a pre-release identifier
+          # (e.g. v2.0.0-beta.1, v2.0.0-0).
+          prerelease: ${{ contains(github.ref_name, '-') }}
           fail_on_unmatched_files: true

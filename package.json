@@ -24,7 +24,8 @@
 		"lint-fix": "run lint --fix",
 		"unit": "node tools/fetch_ffmpeg.mjs && vitest",
 		"license-validate": "sofie-licensecheck",
-		"check-types": "tsc --noEmit"
+		"check-types": "tsc --noEmit",
+		"release": "sofie-version"
 	},
 	"engines": {
 		"node": ">=24.12",
