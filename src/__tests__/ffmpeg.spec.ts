@@ -87,19 +87,18 @@ function runForFFmpegRelease(ffprobePath: string, ffmpegPath: string, ffmpegVers
 	})
 }
 
-
 const ffmpegRootPath = path.join(__dirname, '../../.ffmpeg')
 for (const version of targetVersions[`${process.platform}-${process.arch}`]) {
 	describe(`FFmpeg ${version.id}`, () => {
-    // Newer builds have different path requirements
-    let ffprobeFilename = process.platform === 'win32' ? 'bin/ffprobe.exe' : 'ffprobe'
-    let ffmpegFilename = process.platform === 'win32' ? 'bin/ffmpeg.exe' : 'ffmpeg'
-    if (process.platform === 'linux') {
-      if (!existsSync(path.join(ffmpegRootPath, version.id, ffprobeFilename))) {
-        ffprobeFilename = 'bin/ffprobe'
-        ffmpegFilename = 'bin/ffmpeg'
-      }
-    }
+		// Newer builds have different path requirements
+		let ffprobeFilename = process.platform === 'win32' ? 'bin/ffprobe.exe' : 'ffprobe'
+		let ffmpegFilename = process.platform === 'win32' ? 'bin/ffmpeg.exe' : 'ffmpeg'
+		if (process.platform === 'linux') {
+			if (!existsSync(path.join(ffmpegRootPath, version.id, ffprobeFilename))) {
+				ffprobeFilename = 'bin/ffprobe'
+				ffmpegFilename = 'bin/ffmpeg'
+			}
+		}
 
 		runForFFmpegRelease(
 			path.join(ffmpegRootPath, version.id, ffprobeFilename),
