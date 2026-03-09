@@ -4,13 +4,15 @@ import path from 'path'
 import moment from 'moment'
 import { createRequire } from 'node:module'
 import { describe, test, expect } from 'vitest'
+import { existsSync } from 'node:fs'
 
 const require = createRequire(import.meta.url)
 const targetVersions = require('./ffmpegReleases.json')
 
 const testMediaPath = path.join(__dirname, 'samples')
 
-function runForFFmpegRelease(ffprobePath: string, ffmpegPath: string, _ffmpegVersion: string) {
+function runForFFmpegRelease(ffprobePath: string, ffmpegPath: string, ffmpegVersion: string) {
+	const majorVersion = parseInt(ffmpegVersion.split('.')[0], 10)
 	function createBareDoc(filename: string): PouchDBMediaDocument {
 		return {
 			_id: 'test',
@@ -53,12 +55,14 @@ function runForFFmpegRelease(ffprobePath: string, ffmpegPath: string, _ffmpegVer
 	test('AudioOnly.mp3', async () => {
 		const doc = createBareDoc('AudioOnly.mp3')
 		await generateInfo(defaultConfig, doc)
-		expect(doc.cinf).toBe('"AUDIOONLY"  AUDIO  45678 20231206123456 28788480 1/14112000\r\n')
+		const audioDuration = majorVersion >= 8 ? '28224000' : '28788480'
+		expect(doc.cinf).toBe(`"AUDIOONLY"  AUDIO  45678 20231206123456 ${audioDuration} 1/14112000\r\n`)
 	})
 	test('audio_with_poster.mp3', async () => {
 		const doc = createBareDoc('audio_with_poster.mp3')
 		await generateInfo(defaultConfig, doc)
-		expect(doc.cinf).toBe('"AUDIO_WITH_POSTER"  AUDIO  45678 20231206123456 28788480 1/14112000\r\n')
+		const audioDuration = majorVersion >= 8 ? '28224000' : '28788480'
+		expect(doc.cinf).toBe(`"AUDIO_WITH_POSTER"  AUDIO  45678 20231206123456 ${audioDuration} 1/14112000\r\n`)
 	})
 
 	test('Movie_a0v1.mov', async () => {
