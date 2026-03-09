@@ -2,75 +2,92 @@
 	"linux-x64": [
 		{
 			"id": "4.1.4",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.1.4-amd64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.1.4-amd64-static.tar.xz",
+			"sha256": "546b9eb4517f4f5278356dfa125e08f95829b00282331d23f0c60241955b99c2"
 		},
 		{
 			"id": "4.2.2",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.2.2-amd64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.2.2-amd64-static.tar.xz",
+			"sha256": "c1c7ec5180523db214a7f6f59ea737e8e582570cb884c3ab0c583da4f5165e27"
 		},
 		{
 			"id": "4.4.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.4.1-amd64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.4.1-amd64-static.tar.xz",
+			"sha256": "c6e62ae25279046b394764afa6983a4a6f9998fe0fad7e3f6e3212fbd3374e34"
 		},
 		{
 			"id": "5.1.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.1-amd64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.1-amd64-static.tar.xz",
+			"sha256": "2d848c37f7f276be0262d9123a84fbfe72bb159921ffcce3bd7106f143d29f42"
 		},
 		{
 			"id": "6.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.1-amd64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.1-amd64-static.tar.xz",
+			"sha256": "a25bc0be63bea69a5de2bbe7fb17989c872e48c053c692a3f20ead3c6afe6184"
 		},
 		{
 			"id": "7.0.2",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0.2-amd64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0.2-amd64-static.tar.xz",
+			"sha256": "abda8d77ce8309141f83ab8edf0596834087c52467f6badf376a6a2a4c87cf67"
 		}
 	],
 	"linux-arm64": [
 		{
 			"id": "5.1.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.1-arm64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.1-arm64-static.tar.xz",
+			"sha256": "49f9beb7690afcbd4832d3577d9f0c87374d63c39cde5097dfd52d61b24b4855"
 		},
 		{
 			"id": "6.0.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.0.1-arm64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.0.1-arm64-static.tar.xz",
+			"sha256": "7dbd8e2f47bd83de591b9d6ea70e67d32d9aa97e7d47ae402b60c2fe3fd4d0ab"
 		},
 		{
 			"id": "7.0.2",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0.2-arm64-static.tar.xz"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0.2-arm64-static.tar.xz",
+			"sha256": "f4149bb2b0784e30e99bdda85471c9b5930d3402014e934a5098b41d0f7201b1"
 		}
 	],
 	"win32-x64": [
 		{
 			"id": "4.1.4",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.1.4-win64-static.zip"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.1.4-win64-static.zip",
+			"sha256": "07106b3d3e07fe6ef538bd323c0be0370bacc8d2bd0e769350dc97e8117c01e7"
 		},
 		{
 			"id": "4.2.2",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.2.2-win64-static.zip"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.2.2-win64-static.zip",
+			"sha256": "cdb92a6d233a445716e88f3cc65ce33fbc5d17f46049c5b24e40701df1a30dda"
 		},
 		{
 			"id": "4.3.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.3.1-win64-static.zip"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-4.3.1-win64-static.zip",
+			"sha256": "f33a409dc61df9448dcd0505c6d1614a1c161397b3e5ceaebf8f5c0287374108"
 		},
 		{
 			"id": "5.1.2",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.2-essentials_build.zip"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-5.1.2-essentials_build.zip",
+			"sha256": "ff9f2ecae5e21818400712d13657547a2353ef58a88e6e3f58c91efc49081a4a"
 		},
 		{
 			"id": "6.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.1-essentials_build.zip"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-6.1-essentials_build.zip",
+			"sha256": "5907689bc9a2b12025a2d1dee945757c17dadbd2d4db9673633bc0f547767eee"
 		},
 		{
 			"id": "7.0",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0-essentials_build.zip"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.0-essentials_build.zip",
+			"sha256": "a0b6e8c7978b95d019a93dcf4b4ab74b17d9e53e0a87cfd463e1376c5927e30b"
 		},
 		{
 			"id": "7.1.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.1.1-essentials_build.zip"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-7.1.1-essentials_build.zip",
+			"sha256": "04861d3339c5ebe38b56c19a15cf2c0cc97f5de4fa8910e4d47e5e6404e4a2d4"
 		},
 		{
 			"id": "8.0.1",
-			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-8.0.1-essentials_build.zip"
+			"url": "https://github.com/CasparCG/dependencies/releases/download/ffmpeg-binaries/ffmpeg-8.0.1-essentials_build.zip",
+			"sha256": "e2aaeaa0fdbc397d4794828086424d4aaa2102cef1fb6874f6ffd29c0b88b673"
 		}
 	]
 }

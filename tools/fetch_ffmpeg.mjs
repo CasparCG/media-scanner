@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
 import { createWriteStream } from 'node:fs'
+import { createHash } from 'node:crypto'
 import path from 'path'
 import cp from 'child_process'
 
@@ -33,12 +34,22 @@ if (platformVersions) {
 		const versionPath = path.join(ffmpegRootDir, version.id)
 		const dirStat = await pathExists(versionPath)
 		if (!dirStat) {
+			if (!version.sha256) throw new Error(`SHA256 checksum not set for ${version.id} (${version.url})`)
+
 			console.log(`Fetching ${version.url}`)
 			// Download it
 
 			const response = await fetch(version.url)
 			if (!response.ok) throw new Error(`unexpected response ${response.statusText}`)
 			await streamPipeline(response.body, createWriteStream(tmpPath))
+
+			// Verify SHA256 checksum
+			const fileBuffer = await fs.readFile(tmpPath)
+			const actualHash = createHash('sha256').update(fileBuffer).digest('hex')
+			if (actualHash !== version.sha256) {
+				await fs.rm(tmpPath)
+				throw new Error(`SHA256 mismatch for ${version.url}\n  expected: ${version.sha256}\n  actual:   ${actualHash}`)
+			}
 
 			// Extract it
 			if (version.url.endsWith('.tar.xz')) {
