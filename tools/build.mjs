@@ -29,6 +29,13 @@ await fs.cp(`./node_modules/leveldown/prebuilds/${platform}-${arch}`, `deploy/pr
 	recursive: true,
 })
 
+// Create zip
+const packageJson = await fs.readFile('./package.json')
+const pkg = JSON.parse(packageJson)
+const version = pkg.version
+
+const packageName = 'casparcg-scanner'
+
 const unpacked = !!process.env.UNPACKED
 if (!unpacked) {
 	await fs.writeFile(
@@ -48,7 +55,7 @@ if (!unpacked) {
 	)
 
 	// Run pkg
-	const filename = platform === 'win32' ? 'scanner.exe' : 'scanner'
+	const filename = `${packageName}-v${version}-${platform}-${arch}${platform === 'win32' ? '.exe' : ''}`
 	try {
 		cp.execSync(`pkg -t node24-${platform} . -o ${filename}`, { cwd: './deploy' })
 	} catch (error) {
@@ -58,21 +65,13 @@ if (!unpacked) {
 	}
 
 	await rimraf(['deploy/package.json', 'deploy/scanner.js', 'deploy/prebuilds'])
+} else {
+	const zipFileName = `${packageName}-v${version}-unpacked-${platform}-${arch}.zip`
+
+	const err = await zip('./deploy', `./${zipFileName}`)
+	if (err) {
+		throw new Error(err)
+	}
+
+	await fs.rename(`./${zipFileName}`, `./deploy/${zipFileName}`)
 }
-
-// Create zip
-const packageJson = await fs.readFile('./package.json')
-const pkg = JSON.parse(packageJson)
-const version = pkg.version
-
-const packageName = 'casparcg-scanner'
-const zipFileName = unpacked
-	? `${packageName}-v${version}-unpacked-${platform}-${arch}.zip`
-	: `${packageName}-v${version}-${platform}-${arch}.zip`
-
-const err = await zip('./deploy', `./${zipFileName}`)
-if (err) {
-	throw new Error(err)
-}
-
-await fs.rename(`./${zipFileName}`, `./deploy/${zipFileName}`)
