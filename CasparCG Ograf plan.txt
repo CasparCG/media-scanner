@@ -1,0 +1,29 @@
+CasparCG Ograf plan
+
+
+OgrafAPI
+
+RenderTarget:
+    Channel
+    Layer
+    TemplateLayer
+
+Config:
+   enable ograf api
+   enable media scanner
+
+
+No upload of clips
+
+Use same port as Media Scanner
+
+
+Threading
+
+
+Pouchdb -> sqlite
+
+
+
+
+Core Ograf support

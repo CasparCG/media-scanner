@@ -1,0 +1,37 @@
+{
+  "extends": "@sofie-automation/code-standard-preset/ts/tsconfig.lib",
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/**"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "*": [
+        "./node_modules/*"
+      ],
+      "@helper/shared": [
+        "../shared/src/main.ts"
+      ]
+    },
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "DOM",
+      "ES2024"
+    ],
+    "jsx": "react",
+    "skipLibCheck": true,
+    "composite": true,
+    "noEmit": true
+  },
+  "references": [
+    {
+      "path": "../shared/tsconfig.json"
+    }
+  ]
+}

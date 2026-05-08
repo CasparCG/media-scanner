@@ -1,4 +1,4 @@
-FROM node:24 AS builder
+FROM node:26 AS builder
   WORKDIR /usr/src/app
 
   COPY package.json yarn.lock .yarnrc.yml ./
@@ -14,7 +14,7 @@ FROM node:24 AS builder
 
   RUN rm deploy/*.zip
 
-FROM node:24
+FROM node:26
   WORKDIR /usr/src/app
   ENV NODE_ENV=production
   ENV PATHS__FFMPEG=ffmpeg
@@ -26,5 +26,5 @@ FROM node:24
 
   COPY --from=builder /usr/src/app/deploy /usr/src/app
 
-  ENTRYPOINT [ "node", "scanner.js" ]
+  ENTRYPOINT [ "node", "helper.js" ]
   HEALTHCHECK CMD curl -f http://localhost:8000/healthcheck || exit 1

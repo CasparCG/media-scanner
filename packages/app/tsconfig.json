@@ -1,0 +1,49 @@
+{
+  "extends": "@sofie-automation/code-standard-preset/ts/tsconfig.lib",
+  "include": [
+    "src/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules/**"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "*": [
+        "./node_modules/*"
+      ],
+      "@helper/app": [
+        "./src/main.ts"
+      ],
+      "@helper/media-scanner": [
+        "../media-scanner/src/main.ts"
+      ],
+      "@helper/ograf-server": [
+        "../ograf-server/src/main.ts"
+      ],
+      "@helper/shared": [
+        "../shared/src/main.ts"
+      ]
+    },
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "ES2024"
+    ],
+    "skipLibCheck": true,
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../media-scanner/tsconfig.json"
+    },
+    {
+      "path": "../ograf-server/tsconfig.json"
+    },
+    {
+      "path": "../shared/tsconfig.json"
+    }
+  ]
+}

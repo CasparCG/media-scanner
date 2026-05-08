@@ -5,7 +5,6 @@
 	"description": "",
 	"license": "LGPL-3.0",
 	"type": "module",
-	"main": "dist/index.js",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/CasparCG/media-scanner.git"
@@ -13,12 +12,14 @@
 	"homepage": "https://github.com/CasparCG/media-scanner",
 	"scripts": {
 		"postinstall": "husky",
-		"dev": "tsx --watch ./src/index.ts",
-		"build": "node tools/build.mjs",
-		"build-linux-arm64": "run build linux arm64",
-		"build-linux-x64": "run build linux x64",
-		"build-win32-x64": "run build win32 x64",
-		"build:docker": "docker build .",
+		"dev": "yarn workspaces foreach --all -pi -j unlimited run dev",
+		"build": "tsc --build tsconfig.json && yarn workspaces foreach --all run build",
+		"start": "yarn workspace @helper/app start",
+		"compile": "node tools/build.mjs",
+		"compile-linux-arm64": "run compile linux arm64",
+		"compile-linux-x64": "run compile linux x64",
+		"compile-win32-x64": "run compile win32 x64",
+		"compile:docker": "docker build .",
 		"lint:raw": "run eslint --ext .ts --ext .js --ext .tsx --ext .jsx --ext .mts --ext .mjs --ignore-pattern dist",
 		"lint": "run check-types && run lint:raw .",
 		"lint-fix": "run lint --fix",
@@ -37,6 +38,9 @@
 		"chokidar": "^3.6.0",
 		"cors": "^2.8.5",
 		"express": "^5.2.1",
+		"express-ws": "^5.0.2",
+		"json-rpc-2.0": "^1.7.1",
+		"mime-types": "^3.0.2",
 		"moment": "^2.30.1",
 		"nconf": "^0.13.0",
 		"pino": "^10.1.0",
@@ -44,12 +48,15 @@
 		"pouchdb-node": "^7.3.1",
 		"recursive-readdir": "^2.2.3",
 		"rxjs": "^7.8.2",
-		"xml2js": "^0.6.2"
+		"xml2js": "^0.6.2",
+		"zod": "^4.4.3"
 	},
 	"devDependencies": {
 		"@sofie-automation/code-standard-preset": "3.2.0",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
+		"@types/express-ws": "^3.0.6",
+		"@types/mime-types": "^3.0.1",
 		"@types/nconf": "^0.10.7",
 		"@types/node": "^24.10.4",
 		"@types/pouchdb-node": "^6.1.7",
@@ -60,6 +67,7 @@
 		"eslint": "^9.39.2",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.7",
+		"ograf": "^1.2.0",
 		"prettier": "^3.7.4",
 		"rimraf": "^6.1.2",
 		"tslib": "^2.8.1",
@@ -77,5 +85,8 @@
 		"*.{ts,tsx,js,jsx,mts,mjs}": [
 			"yarn lint:raw --fix"
 		]
-	}
+	},
+	"workspaces": [
+		"packages/*"
+	]
 }

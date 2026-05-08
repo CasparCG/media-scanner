@@ -41,10 +41,11 @@ These endpoints are exposed by the AMCP protocol in CasparCG Server. This means 
 
 # For Developers
 
-## Running in development
+## Prerequisites
 
-This project uses the latest LTS version NodeJS (18), so you need that installed. Get it from: https://nodejs.org/en/.
-We also use Leveldown which uses native modules so if you're on Windows you need to install windows build tools:
+This project uses **NodeJS**. Get it from: [https://nodejs.org](https://nodejs.org).
+
+We also use **Leveldown** which uses native modules so if you're on Windows you need to install windows build tools:
 
 `npm install --global --production windows-build-tools`
 
@@ -55,19 +56,31 @@ After this:
   - FFmpeg 6.1 is currently recommended, newer versions have not been tested and may have issues
   - A full list of known working versions can be found at https://github.com/CasparCG/media-scanner/blob/master/src/__tests__/ffmpegReleases.json
 - [Optional] Copy a `casparcg.config` file into the root folder
-- Run `yarn install`
-- Run `yarn dev` to start the development server
+- Run `yarn install` to install dependencies
+- Run `yarn dev` to start the app in development mode with hot reloading
 
-## Building executable
+## Repository structure:
+
+This is a **mono-repo** using [yarn workspaces](https://yarnpkg.com/features/workspaces), which means that the functionality is divided into multiple packages (under `./packages`). The packages are:
+
+| Name               | Description                                                           |
+| ------------------ | --------------------------------------------------------------------- |
+| **app**            | The main application, this is the starting point for the application. |
+| **media-scanner**  | The media scanning functionality                                      |
+| **ograf-server**   | The [OGraf](https://ograf.ebu.io) Server API functionality            |
+| **ograf-renderer** | The Front-end Ograf Renderer                                          |
+| **shared**         | Utility code and types that are shared between the other packages.    |
+
+## Packaging into executable
 
 Be aware that because of the native extensions, you may only be able to build for the target you are currently on.
 
 - Build for the current platform
-  - `yarn build`
+  - `yarn compile`
 - On Windows
-  - `yarn build-win32-x64`
+  - `yarn compile-win32-x64`
 - On Linux
-  - `yarn build-linux-x64` or `yarn build-linux-arm64` depending on cpu architecture
+  - `yarn compile-linux-x64` or `yarn compile-linux-arm64` depending on cpu architecture
 
 The built files will be placed in `./deploy`, make sure you copy all non-zipfiles into the main CasparCG directory.
 
