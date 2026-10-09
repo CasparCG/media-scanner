@@ -42,7 +42,7 @@ if (!unpacked) {
 		'deploy/package.json',
 		JSON.stringify({
 			name: 'casparcg-scanner',
-			version: '0.0.0',
+			version: version,
 			description: 'CasparCG Media Scanner',
 			main: 'scanner.js',
 			bin: {
