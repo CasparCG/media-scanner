@@ -53,6 +53,6 @@ if (config.caspar && config.caspar.config) {
 	})
 }
 
-if (!config.scanner.path) {
+if (!config.scanner.paths) {
 	config.scanner.paths = config.paths.media
 }
