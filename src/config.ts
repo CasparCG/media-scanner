@@ -40,7 +40,7 @@ const defaults = {
 
 export const config = nconf.argv().env('__').defaults(defaults).get()
 
-if (config.caspar && config.caspar.config) {
+if (config.caspar && config.caspar.config && fs.existsSync(config.caspar.config)) {
 	const parser = new xml2js.Parser()
 	const data = fs.readFileSync(config.caspar.config)
 	parser.parseString(data, (err, result) => {
