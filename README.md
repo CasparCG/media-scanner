@@ -43,10 +43,22 @@ These endpoints are exposed by the AMCP protocol in CasparCG Server. This means 
 
 ## Running in development
 
-This project uses the latest LTS version NodeJS (18), so you need that installed. Get it from: https://nodejs.org/en/.
-We also use Leveldown which uses native modules so if you're on Windows you need to install windows build tools:
+This project requires **Node.js 24.12 or later** (see `engines` in `package.json`). Get it from: https://nodejs.org/en/.
 
-`npm install --global --production windows-build-tools`
+Dependencies are managed with **Yarn 4**, which is installed through [Corepack](https://github.com/nodejs/corepack):
+
+- Node.js 24 bundles Corepack, so `corepack enable` is all that is needed.
+- Node.js 25 and later no longer bundle it. Install it first with `npm install -g corepack`.
+  - If npm fails with `EEXIST` on `yarn` or `pnpm`, an existing install is occupying that name. This includes the official `node:25` Docker images, which ship Yarn 1. `npm install -g corepack --force` replaces those shims.
+
+Skipping this step makes `yarn install` fail with:
+
+```
+This project's package.json defines "packageManager": "yarn@4.12.0".
+However the current global version of Yarn is 1.22.22.
+```
+
+Leveldown ships prebuilt binaries for `linux-x64`, `linux-arm64` and `win32-x64`, so no compiler or Python is needed on the supported platforms.
 
 After this:
 
@@ -54,9 +66,12 @@ After this:
 - [Required] Obtain the [_FFmpeg_ and _FFprobe_](https://ffmpeg.org/download.html) executables and place them in the root folder (or add them to your PATH).
   - FFmpeg 6.1 is currently recommended, newer versions have not been tested and may have issues
   - A full list of known working versions can be found at https://github.com/CasparCG/media-scanner/blob/master/src/__tests__/ffmpegReleases.json
-- [Optional] Copy a `casparcg.config` file into the root folder
+- [Required] Copy a `casparcg.config` file into the root folder. The scanner reads its media and template paths from it, and exits with `ENOENT: no such file or directory, open './casparcg.config'` when it is missing.
+- Run `corepack enable`
 - Run `yarn install`
 - Run `yarn dev` to start the development server
+
+On Windows, PowerShell's default execution policy blocks the `yarn.ps1` shim that Corepack installs. Use `yarn.cmd`, or run the commands from `cmd.exe`.
 
 ## Building executable
 
