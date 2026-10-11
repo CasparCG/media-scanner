@@ -40,84 +40,87 @@ const defaults = {
 
 const args = {
 	'caspar.config': {
-		describe: 'CasparCG config file. Values in this file override any paths.* options. \nDefault: ' + defaults.caspar.config,
-    group: 'Caspar',
-    requiresArg: true,
+		describe:
+			'CasparCG config file. Values in this file override any paths.* options. \nDefault: ' + defaults.caspar.config,
+		group: 'Caspar',
+		requiresArg: true,
 	},
 	'paths.template': {
 		describe: 'Template path. \nDefault: ' + defaults.paths.template,
-    group: 'Paths',
-    requiresArg: true,
+		group: 'Paths',
+		requiresArg: true,
 	},
 	'paths.media': {
 		describe: 'Media path. \nDefault: ' + defaults.paths.media,
 		group: 'Paths',
-    requiresArg: true,
+		requiresArg: true,
 	},
 	'paths.font': {
 		describe: 'Font path. \nDefault: ' + defaults.paths.font,
 		group: 'Paths',
-    requiresArg: true,
+		requiresArg: true,
 	},
 	'paths.ffmpeg': {
 		describe: 'FFmpeg binary path. \nDefault: ' + defaults.paths.ffmpeg,
 		group: 'Paths',
-    requiresArg: true,
+		requiresArg: true,
 	},
 	'paths.ffprobe': {
 		describe: 'FFprobe binary path. \nDefault: ' + defaults.paths.ffprobe,
 		group: 'Paths',
-    requiresArg: true,
+		requiresArg: true,
 	},
 	'scanner.paths': {
 		describe: 'Scanner paths (argument can be repeated)',
-    group: 'Scanner',
-    requiresArg: true,
+		group: 'Scanner',
+		requiresArg: true,
 	},
 	'thumbnails.width': {
 		describe: 'Thumbnail width. \nDefault: ' + defaults.thumbnails.width,
-    group: 'Thumbnails',
-    requiresArg: true,
+		group: 'Thumbnails',
+		requiresArg: true,
 	},
 	'thumbnails.height': {
 		describe: 'Thumbnail height. \nDefault: ' + defaults.thumbnails.height,
 		group: 'Thumbnails',
-    requiresArg: true,
+		requiresArg: true,
 	},
 	'metadata.fieldOrder': {
 		describe: 'Check field order. This is an expensive check, as it requires decoding the beginning of the video',
 		group: 'Metadata',
-    requiresArg: true,
+		requiresArg: true,
 	},
 	'metadata.fieldOrderScanDuration': {
-		describe: 'Field order scan duration (frames), Note: Needs sufficient motion (Not titlecard). \nDefault: ' + defaults.metadata.fieldOrderScanDuration,
+		describe:
+			'Field order scan duration (frames), Note: Needs sufficient motion (Not titlecard). \nDefault: ' +
+			defaults.metadata.fieldOrderScanDuration,
 		group: 'Metadata',
-    requiresArg: true,
+		requiresArg: true,
 	},
 	'logger.level': {
 		describe: 'Logger level. \nDefault: ' + defaults.logger.level,
-    group: 'Logger',
-    requiresArg: true,
+		group: 'Logger',
+		requiresArg: true,
 	},
 	'logger.name': {
 		describe: 'Logger name. \nDefault: ' + defaults.logger.name,
-    group: 'Logger',
-    requiresArg: true,
+		group: 'Logger',
+		requiresArg: true,
 	},
 	'logger.print': {
 		describe: 'Logger print to console. \nDefault: ' + defaults.logger.print,
-    group: 'Logger',
-    requiresArg: true,
+		group: 'Logger',
+		requiresArg: true,
 	},
 	'http.port': {
 		describe: 'HTTP port. \nDefault: ' + defaults.http.port,
-    group: 'HTTP',
-    requiresArg: true,
+		group: 'HTTP',
+		requiresArg: true,
 	},
 	'http.host': {
 		describe: 'HTTP host. \nDefault: ' + defaults.http.host,
-    group: 'HTTP',
-    requiresArg: true,
+		group: 'HTTP',
+		requiresArg: true,
 	},
 }
 
