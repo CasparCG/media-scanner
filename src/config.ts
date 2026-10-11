@@ -38,7 +38,27 @@ const defaults = {
 	},
 }
 
-export const config = nconf.argv().env('__').defaults(defaults).get()
+const env = {
+	separator: '__',
+	parseValues: true,
+	whitelist: [
+		'caspar__config',
+		'paths__template',
+		'paths__media',
+		'paths__font',
+		'paths__ffmpeg',
+		'paths__ffprobe',
+		'scanner__paths',
+		'thumbnails__width',
+		'thumbnails__height',
+		'metadata__fieldOrder',
+		'metadata__fieldOrderScanDuration',
+		'http__port',
+		'http__host',
+	],
+}
+
+export const config = nconf.argv().env(env).defaults(defaults).get()
 
 if (config.caspar && config.caspar.config) {
 	const parser = new xml2js.Parser()
