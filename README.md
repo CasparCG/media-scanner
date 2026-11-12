@@ -34,7 +34,9 @@ These endpoints are exposed by the AMCP protocol in CasparCG Server. This means 
 - `/thumbnail/generate/<name>` - Backwards compatibility, has no effect
 - `/thumbnail` - Lists the available thumbnails
 - `/thumbnail/<name>` - Gets the thumbnail for a media file
-- `/templates` - Detailed list of templates in JSON format.
+- `/templates` - Detailed list of templates in JSON format, including the Graphics Data Definition (GDD) of each HTML template.
+- `/templates?gdd=false` - Same list without reading the GDD of the templates. Much faster when there are many templates.
+- `/templates/<name>` - Gets the details (including the GDD) of a single template, in the same format as an entry of `/templates`. `<name>` is either the template id (`NEWS/LOWER-THIRD`) or its path relative to the template folder (`news/lower-third.html`)
 - `/media` - Lists available media files in json form with an enhanced set of metadata
 - `/media/info/<name>` - Gets the json enhanced metadata for the specified media file
 - `/media/thumbnail/<name>` - Gets the thumbnail for a media file

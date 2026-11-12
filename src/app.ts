@@ -2,7 +2,7 @@ import express from 'express'
 import { pinoHttp } from 'pino-http'
 import cors from 'cors'
 import recursiveReadDir from 'recursive-readdir'
-import { getId, getGDDScriptElement, extractGDDJSON } from './util.js'
+import { getId, getTemplateType, getTemplateInfo, findTemplateFile } from './util.js'
 import { Logger } from 'pino'
 import { MediaDatabase } from './db.js'
 
@@ -89,8 +89,11 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	)
 	app.get(
 		'/templates',
-		wrap(async (_req, res) => {
+		wrap(async (req, res) => {
 			// TODO (perf) Use scanner?
+
+			// Parsing the GDD of every template is expensive, clients which only need the list can opt out with ?gdd=false
+			const includeGdd = req.query.gdd !== 'false' && req.query.gdd !== '0'
 
 			// List all files in the templates dir
 			const files: string[] = await recursiveReadDir(config.paths.template)
@@ -100,55 +103,23 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 			const htmlTemplates = []
 			const otherTemplates = []
 			for (const filePath of files) {
-				{
-					// Find HTML-based templates:
-					const m = filePath.match(/\.(html|htm)$/)
-					if (m) {
-						htmlTemplates.push({ filePath, type: 'html' })
-						continue
-					}
-				}
-				{
-					// Find other (eg flash) templates:
-					const m = filePath.match(/\.(ft|wt|ct|swf)$/)
-					if (m) {
-						otherTemplates.push({ filePath, type: m[1] })
-						continue
-					}
+				const type = getTemplateType(filePath)
+				if (type === 'html') {
+					htmlTemplates.push({ filePath, type })
+				} else if (type) {
+					otherTemplates.push({ filePath, type })
 				}
 			}
 
-			// Extract any Graphics Data Defintions (GDD) from HTML templates.
-			const htmlTemplatesInfo = await Promise.all(
-				htmlTemplates.map(async ({ filePath, type }) => {
-					const info: { id: string; path: string; type: string; gdd?: Record<string, any>; error?: string } = {
-						id: getId(config.paths.template, filePath),
-						path: filePath,
-						type,
-					}
-					try {
-						const gddScriptElement = await getGDDScriptElement(filePath)
-						if (gddScriptElement) {
-							info.gdd = (await extractGDDJSON(filePath, gddScriptElement)) as any
-						}
-					} catch (error) {
-						info.error = error + ''
-						console.error(error)
-					}
-					return info
-				})
+			// Gather the info for all templates,
+			// extracting any Graphics Data Defintions (GDD) from HTML templates.
+			const templatesInfo = await Promise.all(
+				htmlTemplates
+					.concat(otherTemplates)
+					.map(async ({ filePath, type }) => getTemplateInfo(config.paths.template, filePath, type, includeGdd))
 			)
 
-			// Gather the info for all templates:
-			const otherTemplatesInfo = otherTemplates.map(({ filePath, type }) => {
-				return {
-					id: getId(config.paths.template, filePath),
-					path: filePath,
-					type,
-				}
-			})
-
-			const allTemplates = htmlTemplatesInfo.concat(otherTemplatesInfo).sort((a, b) => {
+			const allTemplates = templatesInfo.sort((a, b) => {
 				// Sort alphabetically
 				if (a.id < b.id) {
 					return -1
@@ -167,6 +138,26 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 			// Send the response.
 			res.set('content-type', 'application/json')
 			res.send(str)
+		})
+	)
+
+	app.get(
+		'/templates/*templatePath',
+		wrap(async (req, res) => {
+			// The template can be requested by id (NEWS/LOWER-THIRD) or by relative path (news/lower-third.html)
+			const templatePath: string | string[] = req.params.templatePath
+			const requested = Array.isArray(templatePath) ? templatePath.join('/') : templatePath
+
+			const filePath = await findTemplateFile(config.paths.template, requested)
+			const type = filePath && getTemplateType(filePath)
+			if (!filePath || !type) {
+				return res.status(404).end()
+			}
+
+			const info = await getTemplateInfo(config.paths.template, filePath, type, true)
+
+			res.set('content-type', 'application/json')
+			return res.send(JSON.stringify(info))
 		})
 	)
 
