@@ -33,7 +33,6 @@
 	},
 	"author": "",
 	"dependencies": {
-		"cheerio": "^1.0.0-rc.12",
 		"chokidar": "^3.6.0",
 		"cors": "^2.8.5",
 		"express": "^5.2.1",
