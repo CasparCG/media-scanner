@@ -2,7 +2,8 @@ import express from 'express'
 import { pinoHttp } from 'pino-http'
 import cors from 'cors'
 import recursiveReadDir from 'recursive-readdir'
-import { getId, getGDDScriptElement, extractGDDJSON } from './util.js'
+import { getId } from './util.js'
+import { TemplateLister } from './templates.js'
 import { Logger } from 'pino'
 import { MediaDatabase } from './db.js'
 
@@ -12,6 +13,7 @@ const wrap = (fn: express.Handler) => (req: express.Request, res: express.Respon
 
 export default function (logger: Logger, db: MediaDatabase, config: Record<string, any>): express.Application {
 	const app = express()
+	const templateLister = new TemplateLister(config.paths.template)
 
 	app.use(pinoHttp({ logger }))
 	app.use(cors())
@@ -90,79 +92,8 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	app.get(
 		'/templates',
 		wrap(async (_req, res) => {
-			// TODO (perf) Use scanner?
-
-			// List all files in the templates dir
-			const files: string[] = await recursiveReadDir(config.paths.template)
-
-			// Categorize HTML templates separately,
-			// because they have features that other template types do not.
-			const htmlTemplates = []
-			const otherTemplates = []
-			for (const filePath of files) {
-				{
-					// Find HTML-based templates:
-					const m = filePath.match(/\.(html|htm)$/)
-					if (m) {
-						htmlTemplates.push({ filePath, type: 'html' })
-						continue
-					}
-				}
-				{
-					// Find other (eg flash) templates:
-					const m = filePath.match(/\.(ft|wt|ct|swf)$/)
-					if (m) {
-						otherTemplates.push({ filePath, type: m[1] })
-						continue
-					}
-				}
-			}
-
-			// Extract any Graphics Data Defintions (GDD) from HTML templates.
-			const htmlTemplatesInfo = await Promise.all(
-				htmlTemplates.map(async ({ filePath, type }) => {
-					const info: { id: string; path: string; type: string; gdd?: Record<string, any>; error?: string } = {
-						id: getId(config.paths.template, filePath),
-						path: filePath,
-						type,
-					}
-					try {
-						const gddScriptElement = await getGDDScriptElement(filePath)
-						if (gddScriptElement) {
-							info.gdd = (await extractGDDJSON(filePath, gddScriptElement)) as any
-						}
-					} catch (error) {
-						info.error = error + ''
-						console.error(error)
-					}
-					return info
-				})
-			)
-
-			// Gather the info for all templates:
-			const otherTemplatesInfo = otherTemplates.map(({ filePath, type }) => {
-				return {
-					id: getId(config.paths.template, filePath),
-					path: filePath,
-					type,
-				}
-			})
-
-			const allTemplates = htmlTemplatesInfo.concat(otherTemplatesInfo).sort((a, b) => {
-				// Sort alphabetically
-				if (a.id < b.id) {
-					return -1
-				} else if (a.id > b.id) {
-					return 1
-				} else {
-					return 0
-				}
-			})
-
-			// Create the final response string.
-			const str = JSON.stringify({
-				templates: allTemplates,
-			})
+			// Create the response string.
+			const str = await templateLister.getJSON()
 
 			// Send the response.
 			res.set('content-type', 'application/json')

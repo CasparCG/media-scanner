@@ -33,9 +33,9 @@
 	},
 	"author": "",
 	"dependencies": {
-		"cheerio": "^1.0.0-rc.12",
 		"chokidar": "^3.6.0",
 		"cors": "^2.8.5",
+		"entities": "^8.1.0",
 		"express": "^5.2.1",
 		"moment": "^2.30.1",
 		"nconf": "^0.13.0",
