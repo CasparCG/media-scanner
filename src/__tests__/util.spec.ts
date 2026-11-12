@@ -107,5 +107,10 @@ describe('findGDDScript', () => {
 		const start = performance.now()
 		expect(find(html)?.text).toBe('1')
 		expect(performance.now() - start).toBeLessThan(500)
+
+		const svg = `<svg><script name="graphics-data-definition">{"a":${'<!--x-->'.repeat(20_000)}1}</script></svg>`
+		const svgStart = performance.now()
+		expect(find(svg + `<script>"${'a'.repeat(1_000_000)}"</script>`)?.text).toBe('{"a":1}')
+		expect(performance.now() - svgStart).toBeLessThan(500)
 	})
 })

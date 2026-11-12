@@ -164,6 +164,23 @@ function findScriptEnd(html: Buffer, from: number): number {
 	}
 }
 
+/**
+ * Returns a function that gives the end of the comment starting at `lt` ("<!--"), or -1 if it is never closed.
+ * A comment ends at "-->" or "--!>"; their next positions are remembered so that the rest of the document is
+ * only searched again once the scan has passed them, keeping many comments linear.
+ */
+function commentEnds(html: Buffer): (lt: number) => number {
+	// -2: not searched yet, -1: there are none
+	let nextEnd = -2
+	let nextEndBang = -2
+	return (lt) => {
+		if (nextEnd !== -1 && nextEnd < lt + 2) nextEnd = html.indexOf('-->', lt + 2)
+		if (nextEndBang !== -1 && nextEndBang < lt + 4) nextEndBang = html.indexOf('--!>', lt + 4)
+		if (nextEnd === -1 && nextEndBang === -1) return -1
+		return nextEndBang !== -1 && (nextEnd === -1 || nextEndBang < nextEnd) ? nextEndBang + 4 : nextEnd + 3
+	}
+}
+
 /** Whether a start tag in SVG/MathML content makes its content HTML again. */
 function isIntegrationPoint(namespace: string, tag: { name: string; attributes: Map<string, string> | undefined }) {
 	if (namespace === 'math' && tag.name === 'annotation-xml') {
@@ -183,7 +200,7 @@ function isBreakout(tag: { name: string; attributes: Map<string, string> | undef
  * The text of a script element in SVG/MathML, where its content is markup rather than raw text: comments and
  * tags are left out, CDATA sections and character references are text. Ends at the "</script" closing it.
  */
-function readForeignScriptText(html: Buffer, from: number): string {
+function readForeignScriptText(html: Buffer, from: number, commentEnd: (lt: number) => number): string {
 	let text = ''
 	let p = from
 	const addText = (end: number) => {
@@ -199,10 +216,9 @@ function readForeignScriptText(html: Buffer, from: number): string {
 		addText(lt)
 		const c = html[lt + 1]
 		if (c === BANG && html[lt + 2] === DASH && html[lt + 3] === DASH) {
-			const end = html.indexOf('-->', lt + 2)
-			const endBang = html.indexOf('--!>', lt + 4)
-			if (end === -1 && endBang === -1) return text
-			p = endBang !== -1 && (end === -1 || endBang < end) ? endBang + 4 : end + 3
+			const end = commentEnd(lt)
+			if (end === -1) return text
+			p = end
 		} else if (html.toString('latin1', lt + 1, lt + 9) === '![CDATA[') {
 			const end = html.indexOf(']]>', lt + 9)
 			text += html.toString('utf8', lt + 9, end === -1 ? html.length : end)
@@ -235,10 +251,7 @@ function readForeignScriptText(html: Buffer, from: number): string {
 export function findGDDScript(html: Buffer): GDDScript | undefined {
 	const len = html.length
 	let pos = 0
-	// Next "-->" and "--!>" (either ends a comment), so that they are only searched for again once passed.
-	// -2: not searched yet, -1: there are none.
-	let nextEnd = -2
-	let nextEndBang = -2
+	const commentEnd = commentEnds(html)
 	// Open <svg>/<math> elements (0: in HTML) and their namespace, and the SVG/MathML elements that hold HTML
 	// again (with the state to return to)
 	let foreign = 0
@@ -250,13 +263,8 @@ export function findGDDScript(html: Buffer): GDDScript | undefined {
 		const c = html[lt + 1]
 
 		if (c === BANG && html[lt + 2] === DASH && html[lt + 3] === DASH) {
-			// A comment, ended by "-->" or "--!>"
-			if (nextEnd !== -1 && nextEnd < lt + 2) nextEnd = html.indexOf('-->', lt + 2)
-			if (nextEndBang !== -1 && nextEndBang < lt + 4) nextEndBang = html.indexOf('--!>', lt + 4)
-			const end = nextEnd
-			const endBang = nextEndBang
-			if (end === -1 && endBang === -1) return undefined
-			pos = endBang !== -1 && (end === -1 || endBang < end) ? endBang + 4 : end + 3
+			pos = commentEnd(lt)
+			if (pos === -1) return undefined
 		} else if (foreign > 0 && html.toString('latin1', lt + 1, lt + 9) === '![CDATA[') {
 			// In SVG/MathML, a CDATA section is text that ends at "]]>"
 			const end = html.indexOf(']]>', lt + 9)
@@ -292,7 +300,7 @@ export function findGDDScript(html: Buffer): GDDScript | undefined {
 					}
 				} else if (tag.name === 'script') {
 					if (tag.attributes?.get('name') === GDD_SCRIPT_NAME) {
-						return { src: tag.attributes.get('src'), text: readForeignScriptText(html, pos) }
+						return { src: tag.attributes.get('src'), text: readForeignScriptText(html, pos, commentEnd) }
 					}
 				} else if (FOREIGN_ROOTS.has(tag.name)) {
 					foreign++
