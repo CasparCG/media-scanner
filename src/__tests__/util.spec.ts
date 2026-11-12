@@ -77,6 +77,27 @@ describe('findGDDScript', () => {
 		expect(find(`<svg><foreignObject><style/>${gdd}</style></foreignObject></svg>`)).toBeUndefined()
 		expect(find(`<svg></svg><title/>${gdd}</title>`)).toBeUndefined()
 		expect(find(`<svg><div></div><title/>${gdd}</title>`)).toBeUndefined()
+		// Integration points depend on the namespace, and on the encoding for <annotation-xml>
+		expect(
+			find(`<math><annotation-xml encoding="text/html"><style>${gdd}</style></annotation-xml></math>`)
+		).toBeUndefined()
+		expect(find(`<math><annotation-xml><style>${gdd}</style></annotation-xml></math>`)?.text).toBe('{}')
+		expect(find(`<math><title><style>${gdd}</style></title></math>`)?.text).toBe('{}')
+		expect(find(`<svg><mi><style>${gdd}</style></mi></svg>`)?.text).toBe('{}')
+		// A CDATA section is text
+		expect(find(`<svg><![CDATA[${gdd}]]></svg>`)).toBeUndefined()
+	})
+
+	it('reads a GDD script in SVG as markup', () => {
+		expect(find('<svg><script name="graphics-data-definition"><![CDATA[{"a":1}]]></script></svg>')?.text).toBe(
+			'{"a":1}'
+		)
+		expect(find('<svg><script name="graphics-data-definition">{"a":<!-- x -->2}</script></svg>')?.text).toBe('{"a":2}')
+		expect(find('<svg><script name="graphics-data-definition">{"a":"&lt;"}</script></svg>')?.text).toBe('{"a":"<"}')
+		expect(find('<svg><script name="graphics-data-definition" src="gdd.json"/></svg>')).toEqual({
+			src: 'gdd.json',
+			text: '',
+		})
 	})
 
 	it('scans many comments in linear time', () => {
