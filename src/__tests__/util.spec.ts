@@ -62,4 +62,29 @@ describe('findGDDScript', () => {
 			)?.text
 		).toBe('1')
 	})
+	it('decodes character references in attribute values', () => {
+		expect(find('<script name="graphics-data-definition" src="a&amp;b.json"></script>')?.src).toBe('a&b.json')
+		expect(find('<script name="graphics-data-definition" src="x?a=1&copy=2"></script>')?.src).toBe('x?a=1&copy=2')
+		expect(find('<script name="graphics&#45;data-definition">1</script>')?.text).toBe('1')
+	})
+
+	it('follows SVG and MathML rules', () => {
+		const gdd = '<script name="graphics-data-definition">{}</script>'
+		// "/>" closes an element, and there are no raw text elements
+		expect(find(`<svg><title/><style/></svg>${gdd}`)?.text).toBe('{}')
+		expect(find(`<math><mi>x</mi><textarea/></math>${gdd}`)?.text).toBe('{}')
+		// ...except in elements that hold HTML again, and after the SVG ends
+		expect(find(`<svg><foreignObject><style/>${gdd}</style></foreignObject></svg>`)).toBeUndefined()
+		expect(find(`<svg></svg><title/>${gdd}</title>`)).toBeUndefined()
+		expect(find(`<svg><div></div><title/>${gdd}</title>`)).toBeUndefined()
+	})
+
+	it('scans many comments in linear time', () => {
+		const html =
+			'<!--x-->'.repeat(20_000) +
+			`<script>"${'a'.repeat(1_000_000)}"</script><script name="graphics-data-definition">1</script>`
+		const start = performance.now()
+		expect(find(html)?.text).toBe('1')
+		expect(performance.now() - start).toBeLessThan(500)
+	})
 })

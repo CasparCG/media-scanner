@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { decodeHTMLAttribute } from 'entities'
 
 export function getId(fileDir: string, filePath: string): string {
 	return path
@@ -29,6 +30,16 @@ const DASH = 0x2d
 
 /** Elements whose content is text rather than markup (script is handled on its own) */
 const RAW_TEXT_ELEMENTS = new Set(['style', 'title', 'textarea', 'xmp', 'iframe', 'noembed', 'noframes', 'noscript'])
+/** Elements that start SVG/MathML content, where raw text elements don't exist and "/>" closes an element */
+const FOREIGN_ROOTS = new Set(['svg', 'math'])
+/** Elements in SVG/MathML whose content is HTML again */
+const INTEGRATION_POINTS = new Set(['foreignobject', 'desc', 'title', 'mi', 'mo', 'mn', 'ms', 'mtext'])
+/** HTML elements that end SVG/MathML content when they appear in it */
+const FOREIGN_BREAKOUTS = new Set(
+	'b big blockquote body br center code dd div dl dt em embed h1 h2 h3 h4 h5 h6 head hr i img li listing menu meta nobr ol p pre ruby s small span strong strike sub sup table tt u ul var'.split(
+		' '
+	)
+)
 
 function isSpace(c: number | undefined): boolean {
 	return c === 0x20 || c === 0x0a || c === 0x09 || c === 0x0c || c === 0x0d
@@ -46,7 +57,7 @@ function isAlpha(c: number | undefined): boolean {
 function readTag(
 	html: Buffer,
 	nameStart: number
-): { name: string; attributes: Map<string, string> | undefined; end: number } | undefined {
+): { name: string; attributes: Map<string, string> | undefined; selfClosing: boolean; end: number } | undefined {
 	const len = html.length
 	let p = nameStart
 	while (p < len && !isSpace(html[p]) && html[p] !== SLASH && html[p] !== GT) p++
@@ -54,9 +65,10 @@ function readTag(
 	const attributes = name === 'script' ? new Map<string, string>() : undefined
 
 	for (;;) {
-		while (p < len && (isSpace(html[p]) || html[p] === SLASH)) p++
+		let slash = false // Whether the last character skipped is a "/", which makes "/>" self-closing
+		while (p < len && (isSpace(html[p]) || html[p] === SLASH)) slash = html[p++] === SLASH
 		if (p >= len) return undefined
-		if (html[p] === GT) return { name, attributes, end: p + 1 }
+		if (html[p] === GT) return { name, attributes, selfClosing: slash, end: p + 1 }
 
 		const attrStart = p++ // The first character always belongs to the name, even "="
 		while (p < len && !isSpace(html[p]) && html[p] !== SLASH && html[p] !== GT && html[p] !== EQUALS) p++
@@ -84,7 +96,10 @@ function readTag(
 		if (attributes) {
 			const attrName = html.toString('latin1', attrStart, attrEnd).toLowerCase()
 			// As in HTML, the first occurrence of an attribute wins
-			if (!attributes.has(attrName)) attributes.set(attrName, html.toString('utf8', valueStart, valueEnd))
+			if (!attributes.has(attrName)) {
+				const value = html.toString('utf8', valueStart, valueEnd)
+				attributes.set(attrName, value.includes('&') ? decodeHTMLAttribute(value) : value)
+			}
 		}
 	}
 }
@@ -152,11 +167,15 @@ function findScriptEnd(html: Buffer, from: number): number {
  * a "<script" is really a tag: comments, quoted attribute values and elements whose content is text are skipped.
  */
 export function findGDDScript(html: Buffer): GDDScript | undefined {
-	// Quick way out for templates without a GDD
-	if (!html.includes(GDD_SCRIPT_NAME)) return undefined
-
 	const len = html.length
 	let pos = 0
+	// Next "-->" and "--!>" (either ends a comment), so that they are only searched for again once passed.
+	// -2: not searched yet, -1: there are none.
+	let nextEnd = -2
+	let nextEndBang = -2
+	// Open <svg>/<math> elements, and the SVG/MathML elements that hold HTML again (with the depth to return to)
+	let foreign = 0
+	const integrationPoints: Array<{ name: string; foreign: number }> = []
 	for (;;) {
 		const lt = html.indexOf(LT, pos)
 		if (lt === -1) return undefined
@@ -164,8 +183,10 @@ export function findGDDScript(html: Buffer): GDDScript | undefined {
 
 		if (c === BANG && html[lt + 2] === DASH && html[lt + 3] === DASH) {
 			// A comment, ended by "-->" or "--!>"
-			const end = html.indexOf('-->', lt + 2)
-			const endBang = html.indexOf('--!>', lt + 4)
+			if (nextEnd !== -1 && nextEnd < lt + 2) nextEnd = html.indexOf('-->', lt + 2)
+			if (nextEndBang !== -1 && nextEndBang < lt + 4) nextEndBang = html.indexOf('--!>', lt + 4)
+			const end = nextEnd
+			const endBang = nextEndBang
 			if (end === -1 && endBang === -1) return undefined
 			pos = endBang !== -1 && (end === -1 || endBang < end) ? endBang + 4 : end + 3
 		} else if (c === BANG || c === QUESTION || (c === SLASH && lt + 2 < len && !isAlpha(html[lt + 2]))) {
@@ -177,12 +198,28 @@ export function findGDDScript(html: Buffer): GDDScript | undefined {
 			const tag = readTag(html, lt + 2)
 			if (!tag) return undefined
 			pos = tag.end
+			const point = integrationPoints[integrationPoints.length - 1]
+			if (point && foreign === 0 && (tag.name === point.name || FOREIGN_ROOTS.has(tag.name))) {
+				foreign = point.foreign
+				integrationPoints.pop()
+			}
+			if (foreign > 0 && FOREIGN_ROOTS.has(tag.name)) foreign--
 		} else if (isAlpha(c)) {
 			const tag = readTag(html, lt + 1)
 			if (!tag) return undefined
 			pos = tag.end
 
-			if (tag.attributes) {
+			if (foreign > 0 && FOREIGN_BREAKOUTS.has(tag.name)) foreign = 0
+			if (foreign > 0 && !tag.attributes) {
+				// SVG/MathML: no raw text, "/>" closes, some elements hold HTML
+				if (FOREIGN_ROOTS.has(tag.name) && !tag.selfClosing) foreign++
+				else if (INTEGRATION_POINTS.has(tag.name) && !tag.selfClosing) {
+					integrationPoints.push({ name: tag.name, foreign })
+					foreign = 0
+				}
+			} else if (FOREIGN_ROOTS.has(tag.name)) {
+				if (!tag.selfClosing) foreign++
+			} else if (tag.attributes) {
 				const end = findScriptEnd(html, pos)
 				if (tag.attributes.get('name') === GDD_SCRIPT_NAME) {
 					return {
