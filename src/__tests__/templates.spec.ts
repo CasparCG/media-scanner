@@ -175,7 +175,27 @@ describe('templates', () => {
 			await fs.writeFile(nested, '')
 			await fs.writeFile(path.join(dir, 'news', 'image.png'), '')
 			await fs.writeFile(path.join(dir, 'score.html'), '')
+			await fs.writeFile(path.join(dir, 'news', 'logo.html.ft'), '')
 		})
+
+		it('matches ids which end like an extension', async () => {
+			const logo = path.join(dir, 'news', 'logo.html.ft')
+			expect(await findTemplateFile(dir, 'NEWS/LOGO.HTML')).toBe(logo)
+			expect(await findTemplateFile(dir, 'news/logo.html.ft')).toBe(logo)
+		})
+
+		it.skipIf(process.platform === 'win32' || process.platform === 'darwin')(
+			'prefers the exact spelling on case-sensitive file systems',
+			async () => {
+				await fs.mkdir(path.join(dir, 'case'))
+				await fs.writeFile(path.join(dir, 'case', 'Clock.html'), '')
+				await fs.writeFile(path.join(dir, 'case', 'clock.html'), '')
+
+				expect(await findTemplateFile(dir, 'case/clock.html')).toBe(path.join(dir, 'case', 'clock.html'))
+				expect(await findTemplateFile(dir, 'case/Clock.html')).toBe(path.join(dir, 'case', 'Clock.html'))
+				expect(await findTemplateFile(dir, 'case/Clock')).toBe(path.join(dir, 'case', 'Clock.html'))
+			}
+		)
 
 		it('matches ids containing a dot', async () => {
 			expect(await findTemplateFile(dir, 'NEWS/LOWER.THIRD')).toBe(dotted)

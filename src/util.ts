@@ -32,9 +32,9 @@ export function getTemplateType(filePath: string): string | undefined {
  * Finds the file of the template that a client asked for.
  * The template can be requested by its id (`NEWS/LOWER-THIRD`) or by its relative path (`news/lower-third.html`).
  *
- * The request is matched folder by folder against the actual contents of the templates dir (ignoring case, like the ids do).
- * This means that a request can never resolve to a file outside of the templates dir,
- * and that only the folders on the way to the template are read, not the whole tree.
+ * The request is matched folder by folder against the actual contents of the templates dir (ignoring case, like the ids do),
+ * so `..` or absolute paths in the request are never resolved and only the folders on the way to the template are read.
+ * Symlinks inside the templates dir are followed (as in the `/templates` listing), so a request can resolve to a file outside of it.
  */
 export async function findTemplateFile(templateDir: string, requested: string): Promise<string | undefined> {
 	const folders = requested.split(/[\\/]+/).filter((part) => part.length > 0)
@@ -42,10 +42,15 @@ export async function findTemplateFile(templateDir: string, requested: string): 
 	if (!fileName) return undefined
 
 	const extMatch = fileName.match(/\.(html|htm|ft|wt|ct|swf)$/i)
-	const ext = extMatch ? extMatch[0].toLowerCase() : undefined
-	const name = (extMatch ? fileName.slice(0, -extMatch[0].length) : fileName).toUpperCase()
-
-	return findTemplateInDir(templateDir, folders, name, ext)
+	if (extMatch) {
+		// A path with an extension (news/clock.html), or else an id which ends like one (LOGO.HTML for logo.html.ft)
+		const ext = extMatch[0].toLowerCase()
+		return (
+			(await findTemplateInDir(templateDir, folders, fileName.slice(0, -ext.length), ext)) ??
+			(await findTemplateInDir(templateDir, folders, fileName, undefined))
+		)
+	}
+	return findTemplateInDir(templateDir, folders, fileName, undefined)
 }
 
 async function findTemplateInDir(
@@ -74,14 +79,16 @@ async function findTemplateInDir(
 		return undefined
 	}
 
+	const entryName = (entry: string) => entry.slice(0, -path.extname(entry).length)
+	// Prefer the exact spelling (on case-sensitive file systems), then the HTML template when the same id exists as several types.
+	const priority = (entry: string) => (entryName(entry) === name ? 2 : 0) + (getTemplateType(entry) === 'html' ? 1 : 0)
+
 	const candidates = entries
 		.filter((entry) => {
-			const entryExt = path.extname(entry)
-			if (!getTemplateType(entry) || (ext && entryExt !== ext)) return false
-			return entry.slice(0, -entryExt.length).toUpperCase() === name
+			if (!getTemplateType(entry) || (ext && path.extname(entry) !== ext)) return false
+			return entryName(entry).toUpperCase() === name.toUpperCase()
 		})
-		// When the same id exists as several template types, prefer the HTML one.
-		.sort((a, b) => Number(getTemplateType(b) === 'html') - Number(getTemplateType(a) === 'html'))
+		.sort((a, b) => priority(b) - priority(a))
 	for (const candidate of candidates) {
 		const filePath = path.join(dir, candidate)
 		const stat = await fs.stat(filePath).catch(() => undefined)
