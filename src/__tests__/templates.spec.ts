@@ -184,6 +184,15 @@ describe('templates', () => {
 			expect(await findTemplateFile(dir, 'news/logo.html.ft')).toBe(logo)
 		})
 
+		it('prefers the html template over the exact spelling for an id', async () => {
+			await fs.mkdir(path.join(dir, 'mixed'))
+			await fs.writeFile(path.join(dir, 'mixed', 'Score.ft'), '')
+			await fs.writeFile(path.join(dir, 'mixed', 'score.html'), '')
+
+			expect(await findTemplateFile(dir, 'mixed/Score')).toBe(path.join(dir, 'mixed', 'score.html'))
+			expect(await findTemplateFile(dir, 'mixed/Score.ft')).toBe(path.join(dir, 'mixed', 'Score.ft'))
+		})
+
 		it.skipIf(process.platform === 'win32' || process.platform === 'darwin')(
 			'prefers the exact spelling on case-sensitive file systems',
 			async () => {

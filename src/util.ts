@@ -80,8 +80,13 @@ async function findTemplateInDir(
 	}
 
 	const entryName = (entry: string) => entry.slice(0, -path.extname(entry).length)
-	// Prefer the exact spelling (on case-sensitive file systems), then the HTML template when the same id exists as several types.
-	const priority = (entry: string) => (entryName(entry) === name ? 2 : 0) + (getTemplateType(entry) === 'html' ? 1 : 0)
+	// For an id, prefer the HTML template when the same id exists as several types, then the exact spelling (on case-sensitive file systems).
+	// For a path with an extension the type is given, so only the exact spelling matters.
+	const priority = (entry: string) => {
+		const exact = entryName(entry) === name ? 1 : 0
+		if (ext) return exact
+		return (getTemplateType(entry) === 'html' ? 2 : 0) + exact
+	}
 
 	const candidates = entries
 		.filter((entry) => {
