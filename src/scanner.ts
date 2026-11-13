@@ -136,14 +136,15 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 		doc.mediaSize = mediaStat.size
 		doc.mediaTime = mediaStat.mtime.getTime()
 
-		await Promise.all([
-			generateInfo(config, doc).catch((err) => {
-				mediaLogger.error({ err }, 'Info Failed')
-			}),
-			generateThumb(config, doc).catch((err) => {
-				mediaLogger.error({ err }, 'Thumbnail Failed')
-			}),
-		])
+		// The thumbnail follows the probe, which tells it how long the file is and so where to
+		// take the frame from. A failed probe still gets a thumbnail from the start of the file.
+		const probe = await generateInfo(config, doc).catch((err) => {
+			mediaLogger.error({ err }, 'Info Failed')
+			return undefined
+		})
+		await generateThumb(config, doc, probe).catch((err) => {
+			mediaLogger.error({ err }, 'Thumbnail Failed')
+		})
 
 		await db.put(doc, { force: true })
 
