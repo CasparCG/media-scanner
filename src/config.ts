@@ -21,6 +21,8 @@ const defaults = {
 	thumbnails: {
 		width: 256,
 		height: -1,
+		position: 0.1, // Fraction of a clip's duration where the search for the thumbnail frame starts; 0 = first frame
+		frames: 50, // Frames from that point among which the most representative becomes the thumbnail
 	},
 	metadata: {
 		fieldOrder: false, // This is an expensive check, as it requires decoding the beginning of the video

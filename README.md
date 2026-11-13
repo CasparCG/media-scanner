@@ -22,6 +22,12 @@ The full set of available options and their default values can be found at [conf
 
 By default the scanner expects there to be a casparcg.config file next to the executable to specify the paths to media. To disable use of this file `scanner.exe --caspar null`
 
+#### Thumbnails
+
+Thumbnails are PNG, `thumbnails.width` by `thumbnails.height` pixels (default 256 wide, height from the aspect ratio), and keep the media's alpha channel (with FFmpeg 4.4 or newer; up to 4.3 a graphic is rendered over black). For a moving picture the scanner starts `thumbnails.position` into the clip (default `0.1`, a tenth of its duration) and takes the most representative of the next `thumbnails.frames` frames (default `50`), so a clip that fades up from black or a graphic that opens transparent does not get an empty thumbnail. Stills, audio files with a poster image and files that cannot be probed use their first frame. `--thumbnails.position 0 --thumbnails.frames 1` restores the first-frame behaviour of earlier versions.
+
+Thumbnails are made when a file is first scanned or changes. To regenerate existing ones after changing these options, stop the scanner and delete its database folder (`_media`); the next start rescans everything.
+
 ### AMCP Endpoints
 
 These endpoints are exposed by the AMCP protocol in CasparCG Server. This means that they have some AMCP syntax wrappings, which will likely need to be stripped off if using in an external client
