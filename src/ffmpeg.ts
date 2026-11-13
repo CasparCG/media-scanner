@@ -101,6 +101,10 @@ export async function generateThumb(
 	doc: PouchDBMediaDocument,
 	probe?: FFprobeResult
 ): Promise<void> {
+	// An audio-only file has no picture to take. ffmpeg would only fail with "Output file does not
+	// contain any stream", logged as a thumbnail failure for every sound file in the library.
+	if (probe?.streams && !probe.streams.some((stream) => stream.codec_type === 'video')) return
+
 	const tmpPath = path.join(os.tmpdir(), Math.random().toString(16)) + '.png'
 	await fs.mkdir(path.dirname(tmpPath), { recursive: true })
 

@@ -155,6 +155,13 @@ function runForFFmpegRelease(ffprobePath: string, ffmpegPath: string, ffmpegVers
 			expect(pngSize(await thumbOf('audio_with_poster.mp3')).width).toBe(256)
 		})
 
+		test('an audio-only file gets no thumbnail and no error', async () => {
+			const doc = createBareDoc('AudioOnly.mp3')
+			await generateThumb(thumbConfig, doc, await generateInfo(thumbConfig, doc))
+			expect((doc as any)._attachments).toBeUndefined()
+			expect(doc.tinf).toBeUndefined()
+		})
+
 		test('a file that cannot be probed still gets a thumbnail from its start', async () => {
 			const doc = createBareDoc('Movie_a0v1.mov')
 			await generateThumb(thumbConfig, doc, undefined)
